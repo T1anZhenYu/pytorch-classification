@@ -8,4 +8,4 @@ from .eval import *
 # progress bar
 import os, sys
 #sys.path.append(os.path.join(os.path.dirname(__file__), "progress"))
-from utils.progress.progress.bar import Bar as Bar
+from .progress.progress.bar import Bar as Bar
