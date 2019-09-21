@@ -254,7 +254,6 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda(async=True)
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
-        print('inputs shape',inputs.shape)
         # compute output
         outputs = model(inputs)
 
@@ -263,8 +262,8 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         # measure accuracy and record loss
         prec1, prec5 = accuracy(outputs.data, targets.data, topk=(1, 5))
         losses.update(loss.data, inputs.size(0))
-        top1.update(prec1[0], inputs.size(0))
-        top5.update(prec5[0], inputs.size(0))
+        top1.update(prec1, inputs.size(0))
+        top5.update(prec5, inputs.size(0))
 
         # compute gradient and do SGD step
         optimizer.zero_grad()
