@@ -277,7 +277,7 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         # plot progress
         bar.suffix  = '({batch}/{size})  | Batch: {bt:.3f}s |  Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
                     batch=batch_idx + 1,
-                    size=len(testloader),
+                    size=len(trainloader),
                     bt=batch_time.avg,
                     loss=losses.avg,
                     top1=top1.avg,
