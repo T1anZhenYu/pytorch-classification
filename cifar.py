@@ -254,7 +254,7 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         if use_cuda:
             inputs, targets = inputs.cuda(), targets.cuda(async=True)
         inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
-
+        print('inputs shape',inputs.shape)
         # compute output
         outputs = model(inputs)
         loss = criterion(outputs, targets)
