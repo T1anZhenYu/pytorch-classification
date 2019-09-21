@@ -260,7 +260,7 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         print('outputs:',outputs[:10,:])
         print('targets:',targets[:10])
         loss = criterion(outputs, targets)
-        print('loss shape',loss.shape)
+        print('loss shape',loss)
         # measure accuracy and record loss
         prec1, prec5 = accuracy(outputs.data, targets.data, topk=(1, 5))
         losses.update(loss.data[0], inputs.size(0))
