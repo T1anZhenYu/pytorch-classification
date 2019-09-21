@@ -6,6 +6,7 @@ import os
 import sys
 import numpy as np
 
+
 __all__ = ['Logger', 'LoggerMonitor', 'savefig']
 
 def savefig(fname, dpi=None):
