@@ -275,10 +275,9 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         end = time.time()
 
         # plot progress
-        bar.suffix  = '({batch}/{size})  | Batch: {bt:.3f}s |  Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
+        bar.suffix  = '({batch}/{size}) |  Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
                     batch=batch_idx + 1,
                     size=len(trainloader),
-                    bt=batch_time.avg,
                     loss=losses.avg,
                     top1=top1.avg,
                     top5=top5.avg,
@@ -324,10 +323,9 @@ def test(testloader, model, criterion, epoch, use_cuda):
         end = time.time()
 
         # plot progress
-        bar.suffix  = '({batch}/{size})  | Batch: {bt:.3f}s |  Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
+        bar.suffix  = '({batch}/{size})|  Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
                     batch=batch_idx + 1,
                     size=len(testloader),
-                    bt=batch_time.avg,
                     loss=losses.avg,
                     top1=top1.avg,
                     top5=top5.avg,
