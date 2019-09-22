@@ -49,7 +49,7 @@ class Conv2d_new(nn.Conv2d):
         #self.weight = torch.nn.Parameter((weight), requires_grad=True)
 
         # out1_hat = (out1 - mu) / torch.sqrt(var + eps)
-        return F.conv2d(x, weight, self.bias, self.stride,
+        return F.conv2d(x, weight/torch.sqrt(var+eps), self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
 
 
