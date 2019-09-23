@@ -35,9 +35,9 @@ class Conv2d_new(nn.Conv2d):
     def forward(self, x):
         weight = self.weight  # in_C,out_C,w,h
 
-        self.moving_mean = self.momente * self.moving_mean + (1 - self.momente) * \
+        self.moving_mean = nn.Parameter(self.momente * self.moving_mean + (1 - self.momente) * \
                       weight.mean(dim=1, keepdim=True).mean(dim=2, keepdim=True). \
-                          mean(dim=3, keepdim=True)
+                          mean(dim=3, keepdim=True),requires_grad=False)
 
         weight = weight - self.moving_mean
         # std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
@@ -47,8 +47,8 @@ class Conv2d_new(nn.Conv2d):
         eps = 1e-5
         shape_2d = (1, out1.shape[1], 1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
-        self.moving_var = self.momente*self.moving_var *(1-self.momente)*torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1).detach()  # biased
+        self.moving_var = nn.Parameter(self.momente*self.moving_var *(1-self.momente)*torch.transpose(torch.mean(
+            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1),requires_grad=False) # biased
 
         # self.weight = torch.nn.Parameter((weight), requires_grad=True)
 
