@@ -28,17 +28,17 @@ class Conv2d_new(nn.Conv2d):
                  padding=0, dilation=1, groups=1, bias=True):
         super(Conv2d_new, self).__init__(in_channels, out_channels, kernel_size, stride,
                                          padding, dilation, groups, bias)
-        self.moving_mean = nn.Parameter(torch.zeros(out_channels), requires_grad=False)
-        self.moving_var = nn.Parameter(torch.ones(out_channels), requires_grad=False)
+        self.moving_mean = nn.Parameter(torch.zeros(in_channels), requires_grad=False)
+        self.moving_var = nn.Parameter(torch.ones(in_channels), requires_grad=False)
         self.momente = 0.9
 
     def forward(self, x):
         weight = self.weight  # in_C,out_C,w,h
-
+        print("weight shape:",weight.shape)
         self.moving_mean = nn.Parameter(self.momente * self.moving_mean + (1 - self.momente) * \
                       weight.mean(dim=1, keepdim=True).mean(dim=2, keepdim=True). \
                           mean(dim=3, keepdim=True),requires_grad=False)
-
+        print("moving_mean shape:",self.moving_mean.shape)
         weight = weight - self.moving_mean
         # std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
         # weight = weight / std.expand_as(weight)
