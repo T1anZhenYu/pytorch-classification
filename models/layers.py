@@ -39,15 +39,15 @@ class Conv2d_new(nn.Conv2d):
         weight_mean = (1 - self.momente) * \
                       weight.mean(dim=1, keepdim=True).mean(dim=2, keepdim=True). \
                           mean(dim=3, keepdim=True)
-        print("weight mean shape", weight_mean.shape)
+
         self.moving_mean = nn.Parameter(self.momente * self.moving_mean + weight_mean,requires_grad=False)
-        print("moving_mean shape:",self.moving_mean.shape)
+
         weight = weight - self.moving_mean
         # std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
         # weight = weight / std.expand_as(weight)
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
-        print('out1 shape:',out1.shape)
+
         eps = 1e-5
         shape_2d = (1, out1.shape[1], 1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
