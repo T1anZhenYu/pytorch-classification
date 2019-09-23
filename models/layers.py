@@ -30,7 +30,7 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
-        self.momente = 0.9
+        self.momente = 0.5
 
     def forward(self, x):
         weight = self.weight  # out_C,in_C,w,h
@@ -50,7 +50,7 @@ class Conv2d_new(nn.Conv2d):
         shape_2d = (1,out1.shape[1],1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
         var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1).detach() # biased
+            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1) # biased
 
         self.moving_var = nn.Parameter(self.momente*self.moving_var + (1-self.momente)*var,requires_grad=False)
 
