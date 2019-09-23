@@ -43,19 +43,23 @@ class Conv2d_new(nn.Conv2d):
         weight = weight - weight_mean
         # std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
         # weight = weight / std.expand_as(weight)
-        out1 = F.conv2d(x, weight, self.bias, self.stride,
+        # out1 = F.conv2d(x, weight, self.bias, self.stride,
+        #                 self.padding, self.dilation, self.groups)
+        #
+        # eps = 1e-5
+        # shape_2d = (1,out1.shape[1],1, 1)
+        # mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
+        # var = torch.transpose(torch.mean(
+        #     (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1) # biased
+        #
+        # self.moving_var = nn.Parameter(self.momente*self.moving_var + (1-self.momente)*var,requires_grad=False)
+
+        std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
+        weight = weight / std.expand_as(weight)
+        return F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
-
-        eps = 1e-5
-        shape_2d = (1,out1.shape[1],1, 1)
-        mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
-        var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1) # biased
-
-        self.moving_var = nn.Parameter(self.momente*self.moving_var + (1-self.momente)*var,requires_grad=False)
-
-        return F.conv2d(x, weight / torch.sqrt(self.moving_var + eps), self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
+        # return F.conv2d(x, weight / torch.sqrt(self.moving_var + eps), self.bias, self.stride,
+        #                 self.padding, self.dilation, self.groups)
 
 
 def BatchNorm2d(num_features):
