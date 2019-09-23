@@ -33,14 +33,15 @@ class Conv2d_new(nn.Conv2d):
         self.momente = 0.5
 
     def forward(self, x):
-        weight = self.weight  # out_C,in_C,w,h
-
-
-        weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2, keepdim=True). \
-                          mean(dim=3, keepdim=True)
-
-
+        # return super(Conv2d, self).forward(x)
+        weight = self.weight
+        weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
+                                                            keepdim=True).mean(dim=3, keepdim=True)
         weight = weight - weight_mean
+        std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
+        weight = weight / std.expand_as(weight)
+        return F.conv2d(x, weight, self.bias, self.stride,
+                        self.padding, self.dilation, self.groups)
         # std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
         # weight = weight / std.expand_as(weight)
         # out1 = F.conv2d(x, weight, self.bias, self.stride,
@@ -54,10 +55,7 @@ class Conv2d_new(nn.Conv2d):
         #
         # self.moving_var = nn.Parameter(self.momente*self.moving_var + (1-self.momente)*var,requires_grad=False)
 
-        std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
-        weight = weight / std.expand_as(weight)
-        return F.conv2d(x, weight, self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
+
         # return F.conv2d(x, weight / torch.sqrt(self.moving_var + eps), self.bias, self.stride,
         #                 self.padding, self.dilation, self.groups)
 
