@@ -34,7 +34,7 @@ class Conv2d_new(nn.Conv2d):
 
     def forward(self, x):
         weight = self.weight  # out_C,in_C,w,h
-        print("weight shape:",weight.shape)
+
 
         weight_mean = (1 - self.momente) * \
                       weight.mean(dim=1, keepdim=True).mean(dim=2, keepdim=True). \
