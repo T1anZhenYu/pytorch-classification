@@ -30,10 +30,9 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
-        self.momente = 0.9
+        self.momente = 0.1
 
-    def forward(self, x):
-        # return super(Conv2d, self).forward(x)
+    def forward(self, x):  # return super(Conv2d, self).forward(x)
         weight = self.weight
         weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
                                                             keepdim=True).mean(dim=3, keepdim=True)
