@@ -51,13 +51,13 @@ class Conv2d_new(nn.Conv2d):
         eps = 1e-5
         shape_2d = (1, out1.shape[1], 1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
-        self.moving_var = torch.transpose(torch.mean(
+        var = torch.transpose(torch.mean(
             (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1).detach() # biased
 
         # self.weight = torch.nn.Parameter((weight), requires_grad=True)
 
         # out1_hat = (out1 - mu) / torch.sqrt(var + eps)
-        return F.conv2d(x, weight / torch.sqrt(self.moving_var + eps), self.bias, self.stride,
+        return F.conv2d(x, weight / torch.sqrt(var + eps), self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
 
 
