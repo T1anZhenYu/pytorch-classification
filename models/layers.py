@@ -40,7 +40,7 @@ class Conv2d_new(nn.Conv2d):
                       weight.mean(dim=1, keepdim=True).mean(dim=2, keepdim=True). \
                           mean(dim=3, keepdim=True)
 
-        self.moving_mean = nn.Parameter(self.momente * self.moving_mean + weight_mean,requires_grad=False)
+        self.moving_mean = nn.Parameter(self.momente * self.moving_mean + weight_mean,requires_grad=True)
 
         weight = weight - self.moving_mean
         # std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
