@@ -28,12 +28,12 @@ class Conv2d_new(nn.Conv2d):
                  padding=0, dilation=1, groups=1, bias=True):
         super(Conv2d_new, self).__init__(in_channels, out_channels, kernel_size, stride,
                                          padding, dilation, groups, bias)
-        self.moving_mean = nn.Parameter(torch.zeros(in_channels), requires_grad=False)
-        self.moving_var = nn.Parameter(torch.ones(in_channels), requires_grad=False)
+        self.moving_mean = nn.Parameter(torch.zeros([out_channels,1,1,1]), requires_grad=False)
+        self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
         self.momente = 0.9
 
     def forward(self, x):
-        weight = self.weight  # in_C,out_C,w,h
+        weight = self.weight  # out_C,in_C,w,h
         print("weight shape:",weight.shape)
 
         weight_mean = (1 - self.momente) * \
@@ -47,6 +47,7 @@ class Conv2d_new(nn.Conv2d):
         # weight = weight / std.expand_as(weight)
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
+        print('out1 shape:',out1.shape)
         eps = 1e-5
         shape_2d = (1, out1.shape[1], 1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
