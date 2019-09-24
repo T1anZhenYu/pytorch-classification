@@ -31,7 +31,7 @@ class Conv2d_new(nn.Conv2d):
 
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
         self.momente = 0.1
-        self.alpha = torch.ones([[out_channels,1,1,1]])+\
+        self.alpha = torch.ones([out_channels,1,1,1])+\
                      torch.abs(nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=True))
     def forward(self, x):  # return super(Conv2d, self).forward(x)
         weight = self.weight
