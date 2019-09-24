@@ -30,7 +30,7 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
-        self.momente = 0.1
+        self.momente = 0.01
         self.alpha = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=True)
 
 
