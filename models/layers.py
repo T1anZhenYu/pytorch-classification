@@ -48,7 +48,7 @@ class Conv2d_new(nn.Conv2d):
         print('alpha',(1+self.alpha).dtype)
         self.moving_var = nn.Parameter(*self.momente*self.moving_var +
                                        (1-self.momente)*var,requires_grad=False)
-        return F.conv2d(x, weight /torch.sqrt((1+self.alpha)*self.moving_var + eps), \
+        return (1+self.alpha)*F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
 
 
