@@ -31,7 +31,7 @@ class Conv2d_new(nn.Conv2d):
 
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
         self.momente = 0.1
-        self.alpha = torch.abs(nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=True))
+        self.alpha = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=True)
     def forward(self, x):  # return super(Conv2d, self).forward(x)
         weight = self.weight
         weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
@@ -48,7 +48,7 @@ class Conv2d_new(nn.Conv2d):
         print('alpha',(1+self.alpha).dtype)
         self.moving_var = nn.Parameter(*self.momente*self.moving_var +
                                        (1-self.momente)*var,requires_grad=False)
-        return (1+self.alpha)*F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
+        return (self.alpha)*F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
 
 
