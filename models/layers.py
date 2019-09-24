@@ -47,7 +47,7 @@ class Conv2d_new(nn.Conv2d):
             (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1) # biased
         self.moving_var = nn.Parameter(self.momente*self.moving_var +
                                        (1-self.momente)*var,requires_grad=False)
-        return F.conv2d(x, weight / (self.alpha*self.sqrt(self.moving_var + eps)), \
+        return F.conv2d(x, weight / (self.alpha*torch.sqrt(self.moving_var + eps)), \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
 
 
