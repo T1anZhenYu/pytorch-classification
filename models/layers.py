@@ -38,7 +38,7 @@ class Conv2d_new(nn.Conv2d):
         weight = self.weight
         weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
                                                             keepdim=True).mean(dim=3, keepdim=True)
-        weight = weight - weight_mean
+        #weight = weight - weight_mean
 
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
