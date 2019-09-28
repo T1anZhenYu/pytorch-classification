@@ -11,7 +11,7 @@ import torch.nn as nn
 import math
 from .. import layers as L
 
-__all__ = ['resnet_ws']
+__all__ = ['resnet_ws_flip']
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -99,7 +99,7 @@ class Bottleneck(nn.Module):
         return out
 
 
-class ResNet_WS(nn.Module):
+class ResNet_WS_FLIP(nn.Module):
 
     def __init__(self, depth, num_classes=1000, block_name='BasicBlock'):
         super(ResNet_WS, self).__init__()
@@ -169,8 +169,8 @@ class ResNet_WS(nn.Module):
         return x
 
 
-def resnet_ws(**kwargs):
+def resnet_ws_flip(**kwargs):
     """
     Constructs a ResNet_WS model.
     """
-    return ResNet_WS(**kwargs)
+    return ResNet_WS_FLIP(**kwargs)
