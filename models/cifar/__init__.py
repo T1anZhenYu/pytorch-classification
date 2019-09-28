@@ -70,3 +70,4 @@ from .preresnet import *
 from .densenet import *
 from .resnet_ws import *
 from .resnet_new_ws import *
+from .resnet_conv_flip import *
