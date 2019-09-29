@@ -250,7 +250,7 @@ def main():
 def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
     # switch to train mode
     model.train()
-
+    print('model stat_dcit:',model.state_dict().keys())
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()

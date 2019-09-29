@@ -31,7 +31,7 @@ class Conv2d_new(nn.Conv2d):
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
         self.momente = 0.01
         self.alpha = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=True)
-
+        self.loss = 0
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
         weight = self.weight
@@ -48,9 +48,10 @@ class Conv2d_new(nn.Conv2d):
             (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
         self.moving_var = nn.Parameter(self.momente*self.moving_var +
                                        (1-self.momente)*var,requires_grad=False)
-        return F.conv2d(x, (weight /torch.sqrt(self.moving_var + eps), \
+        real_out = F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
-
+        self.loss = torch.norm(real_out,out1)
+        return real_out
 
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
