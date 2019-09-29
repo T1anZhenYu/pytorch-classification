@@ -41,7 +41,7 @@ class Conv2d_new(nn.Conv2d):
 
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
-        std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
+        std = weight.view(weight.size(0), -1).std().view(-1, 1, 1, 1) + 1e-5
         weight = weight / std.expand_as(weight)
         # eps = 1e-5
         # shape_2d = (1,out1.shape[1],1, 1)
