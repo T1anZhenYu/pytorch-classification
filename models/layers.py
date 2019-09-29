@@ -30,7 +30,7 @@ class Conv2d_new(nn.Conv2d):
 
         self.moving_var = nn.Parameter(torch.ones([out_channels,1,1,1]), requires_grad=False)
         self.momente = 0.01
-        self.loss = nn.Parameter(0, requires_grad=True)
+        self.loss = nn.Parameter(torch.zeros(0), requires_grad=True)
 
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
