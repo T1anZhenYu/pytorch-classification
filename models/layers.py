@@ -50,7 +50,7 @@ class Conv2d_new(nn.Conv2d):
                                        (1-self.momente)*var,requires_grad=False)
         real_out = F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
-        self.loss = torch.norm(real_out,out1)
+        self.loss = torch.norm(real_out-out1)
         return real_out
 
 def BatchNorm2d(num_features):
