@@ -272,6 +272,8 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         w_loss = 0
         for item in model.state_dict().keys():
             if item.split('.')[0] == 'loss':
+                print('item is ',item)
+                print('item value is ',model.state_dict(item))
                 w_loss += model.state_dict(item)
         print('w_loss is ',w_loss)
         loss += w_loss/(300)*epoch
