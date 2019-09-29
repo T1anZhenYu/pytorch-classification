@@ -271,6 +271,7 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         loss = criterion(outputs, targets)
         w_loss = 0
         for item in model.state_dict().keys():
+            print(item)
             if item.split('.')[0] == 'loss':
                 print('item is ',item)
                 print('item value is ',model.state_dict(item))
