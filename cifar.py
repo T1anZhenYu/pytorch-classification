@@ -272,7 +272,7 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         w_loss = 0
         for item in model.state_dict().keys():
             if item.split('.')[-1] == 'loss':
-                w_loss += model.state_dict(item)
+                w_loss += model.state_dict()[item]
         print('w_loss is ',w_loss)
         loss += w_loss/(300)*epoch
         # measure accuracy and record loss
