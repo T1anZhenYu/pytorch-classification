@@ -41,15 +41,19 @@ class Conv2d_new(nn.Conv2d):
 
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
-        eps = 1e-5
-        shape_2d = (1,out1.shape[1],1, 1)
-        mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
-        var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
-        self.moving_var = nn.Parameter(self.momente*self.moving_var +
-                                       (1-self.momente)*var,requires_grad=False)
-        real_out = F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
-                        self.bias, self.stride,self.padding, self.dilation, self.groups)
+        std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
+        weight = weight / std.expand_as(weight)
+        # eps = 1e-5
+        # shape_2d = (1,out1.shape[1],1, 1)
+        # mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
+        # var = torch.transpose(torch.mean(
+        #     (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
+        # self.moving_var = nn.Parameter(self.momente*self.moving_var +
+        #                                (1-self.momente)*var,requires_grad=False)
+        # real_out = F.conv2d(x, weight /torch.sqrt(self.moving_var + eps), \
+        #                 self.bias, self.stride,self.padding, self.dilation, self.groups)
+        real_out = F.conv2d(x, weight, self.bias, self.stride,
+                        self.padding, self.dilation, self.groups)
         self.loss = nn.Parameter(torch.norm(real_out-out1), requires_grad=True)
         return real_out
 
