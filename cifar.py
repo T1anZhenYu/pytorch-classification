@@ -250,7 +250,6 @@ def main():
 def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
     # switch to train mode
     model.train()
-    print('model stat_dcit:',model.state_dict().keys())
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
@@ -274,6 +273,7 @@ def train(trainloader, model, criterion, optimizer, epoch, use_cuda):
         for item in model.state_dict().keys():
             if item.split('.')[0] == 'loss':
                 w_loss += model.state_dict(item)
+        print('w_loss is ',w_loss)
         loss += w_loss/(300)*epoch
         # measure accuracy and record loss
         prec1, prec5 = accuracy(outputs.data, targets.data, topk=(1, 5))
