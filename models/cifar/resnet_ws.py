@@ -10,7 +10,8 @@ https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 import torch.nn as nn
 import math
 from .. import layers as L
-
+import numpy as np
+import time
 __all__ = ['resnet_ws']
 
 
@@ -151,8 +152,11 @@ class ResNet_WS(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        dic = {}
         x = self.conv1(x)
+        dic['beforeBN'] = x
         x = self.bn1(x)
+        dic['afterBN'] = x
         x = self.relu(x)  # 32x32
 
         x = self.layer1(x)  # 32x32
@@ -162,7 +166,7 @@ class ResNet_WS(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
-
+        np.savez(time.time()+".npz",**dic)
         return x
 
 
