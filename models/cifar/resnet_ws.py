@@ -166,7 +166,7 @@ class ResNet_WS(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
-        np.savez(time.time()+".npz",**dic)
+        np.savez(str(time.time())+".npz",**dic)
         return x
 
 
