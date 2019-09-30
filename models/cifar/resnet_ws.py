@@ -154,9 +154,9 @@ class ResNet_WS(nn.Module):
     def forward(self, x):
         dic = {}
         x = self.conv1(x)
-        dic['beforeBN'] = x.detach().numpy()
+        dic['beforeBN'] = x.detach().cpu().numpy()
         x = self.bn1(x)
-        dic['afterBN'] = x.detach().numpy
+        dic['afterBN'] = x.detach().cpu().numpy()
         x = self.relu(x)  # 32x32
 
         x = self.layer1(x)  # 32x32
