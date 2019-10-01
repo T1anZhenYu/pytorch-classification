@@ -13,6 +13,7 @@ import math
 from .. import layers as L
 import numpy as np
 import time
+
 __all__ = ['resnet_ws']
 
 
@@ -39,7 +40,8 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
-        self.iter = nn.Parameter(torch.zeros(1),requires_grad=False)
+        self.iter = nn.Parameter(torch.zeros(1), requires_grad=False)
+
     def forward(self, x):
         residual = x
         dic = {}
@@ -53,13 +55,14 @@ class BasicBlock(nn.Module):
         dic['beforeBN'] = out.detach().cpu().numpy()
         out = self.bn2(out)
         dic['afterBN'] = out.detach().cpu().numpy()
-        np.savez(str(time.time())+".npz",**dic)
+        if self.iter % 50 == 0:
+            np.savez(str(time.time()) + ".npz", **dic)
         if self.downsample is not None:
             residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
-        self.iter = nn.Parameter(self.iter + 1,requires_grad=False)
+        self.iter = nn.Parameter(self.iter + 1, requires_grad=False)
         return out
 
 
@@ -104,7 +107,7 @@ class Bottleneck(nn.Module):
 
         out += residual
         out = self.relu(out)
-        np.savez(str(time.time())+".npz",**dic)
+        np.savez(str(time.time()) + ".npz", **dic)
         return out
 
 
