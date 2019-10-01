@@ -7,6 +7,7 @@ and
 https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 (c) YANG, Wei
 '''
+import torch
 import torch.nn as nn
 import math
 from .. import layers as L
@@ -38,13 +39,14 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
-
+        self.iter = nn.Parameter(torch.zeros(1),requires_grad=False)
     def forward(self, x):
         residual = x
         dic = {}
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
+        dic['iter'] = self.iter.cpu().numpy()
         dic['input'] = out.detach().cpu().numpy()
         out = self.conv2(out)
         dic['weight'] = self.conv2.weight.detach().cpu().numpy()
@@ -57,7 +59,7 @@ class BasicBlock(nn.Module):
 
         out += residual
         out = self.relu(out)
-
+        self.iter = nn.Parameter(self.iter + 1,requires_grad=False)
         return out
 
 
