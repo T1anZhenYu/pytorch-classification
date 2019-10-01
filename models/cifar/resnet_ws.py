@@ -47,7 +47,7 @@ class BasicBlock(nn.Module):
         out = self.relu(out)
         dic['input'] = out.detach().cpu().numpy()
         out = self.conv2(out)
-        dic['weight'] = self.conv2.weight
+        dic['weight'] = self.conv2.weight.detach().cpu().numpy()
         dic['beforeBN'] = out.detach().cpu().numpy()
         out = self.bn2(out)
         dic['afterBN'] = out.detach().cpu().numpy()
