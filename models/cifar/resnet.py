@@ -40,11 +40,12 @@ class BasicBlock(nn.Module):
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-        dic['input'] = out
+        dic['input'] = out.detach().cpu().numpy()
         out = self.conv2(out)
-        dic['beforeBN'] = out
+        dic['beforeBN'] = out.detach().cpu().numpy()
         out = self.bn2(out)
-        dic['afterBN'] = out
+        dic['afterBN'] = out.detach().cpu().numpy()
+        dic['weight'] = self.conv2.weight.detach().cpu().numpy()
         if self.iter%50 == 0 and self.conv2.in_channels == 16:
             np.savez(str(time.time())+'.npz',**dic)
         if self.downsample is not None:
