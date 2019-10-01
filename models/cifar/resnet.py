@@ -46,7 +46,7 @@ class BasicBlock(nn.Module):
         out = self.bn2(out)
         dic['afterBN'] = out
         if self.iter%50 == 0 and self.conv2.in_channels == 16:
-            np.savez(time.time()+'.npz',**dic)
+            np.savez(str(time.time())+'.npz',**dic)
         if self.downsample is not None:
             residual = self.downsample(x)
 
