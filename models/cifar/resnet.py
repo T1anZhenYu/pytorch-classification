@@ -7,9 +7,11 @@ and
 https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 (c) YANG, Wei
 '''
+import torch
 import torch.nn as nn
 import math
-
+import numpy as np
+import time
 
 __all__ = ['resnet']
 
@@ -31,17 +33,20 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
-
+        self.iter = nn.Parameter(torch.zeros(1),requires_grad=False)
     def forward(self, x):
         residual = x
-
+        dic = {}
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-
+        dic['input'] = out
         out = self.conv2(out)
+        dic['beforeBN'] = out
         out = self.bn2(out)
-
+        dic['afterBN'] = out
+        if self.iter%50 == 0 and self.conv2.in_channels == 16:
+            np.savez(time.time()+'.npz',**dic)
         if self.downsample is not None:
             residual = self.downsample(x)
 
