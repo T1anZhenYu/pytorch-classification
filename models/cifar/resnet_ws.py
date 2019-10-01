@@ -77,14 +77,18 @@ class Bottleneck(nn.Module):
         self.stride = stride
 
     def forward(self, x):
+        dic = {}
+
         residual = x
 
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-
+        dic['input'] = out.detach().cpu().numpy()
         out = self.conv2(out)
+        dic['beforeBN'] = out.detach().cpu().numpy()
         out = self.bn2(out)
+        dic['afterBN'] = out.detach().cpu().numpy()
         out = self.relu(out)
 
         out = self.conv3(out)
@@ -95,7 +99,7 @@ class Bottleneck(nn.Module):
 
         out += residual
         out = self.relu(out)
-
+        np.savez(str(time.time())+".npz",**dic)
         return out
 
 
@@ -153,10 +157,11 @@ class ResNet_WS(nn.Module):
 
     def forward(self, x):
         dic = {}
+
         x = self.conv1(x)
-        dic['beforeBN'] = x.detach().cpu().numpy()
+
         x = self.bn1(x)
-        dic['afterBN'] = x.detach().cpu().numpy()
+
         x = self.relu(x)  # 32x32
 
         x = self.layer1(x)  # 32x32
@@ -166,7 +171,7 @@ class ResNet_WS(nn.Module):
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
-        np.savez(str(time.time())+".npz",**dic)
+
         return x
 
 
