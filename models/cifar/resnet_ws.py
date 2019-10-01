@@ -41,14 +41,17 @@ class BasicBlock(nn.Module):
 
     def forward(self, x):
         residual = x
-
+        dic = {}
         out = self.conv1(x)
         out = self.bn1(out)
         out = self.relu(out)
-
+        dic['input'] = out.detach().cpu().numpy()
         out = self.conv2(out)
+        dic['weight'] = self.conv2.weight
+        dic['beforeBN'] = out.detach().cpu().numpy()
         out = self.bn2(out)
-
+        dic['afterBN'] = out.detach().cpu().numpy()
+        np.savez(str(time.time())+".npz",**dic)
         if self.downsample is not None:
             residual = self.downsample(x)
 
