@@ -46,7 +46,8 @@ class BasicBlock(nn.Module):
         out = self.bn2(out)
         dic['afterBN'] = out.detach().cpu().numpy()
         dic['weight'] = self.conv2.weight.detach().cpu().numpy()
-        if self.iter%50 == 0 and self.conv2.in_channels == 16 and self.conv2.out_channels == 32:
+        dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
+        if self.iter%50 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels ==32:
             np.savez(str(time.time())+'.npz',**dic)
         if self.downsample is not None:
             residual = self.downsample(x)
