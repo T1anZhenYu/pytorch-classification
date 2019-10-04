@@ -29,7 +29,6 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.momente = 0.1
-        self.loss = nn.Parameter(torch.zeros(0), requires_grad=True)
 
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
