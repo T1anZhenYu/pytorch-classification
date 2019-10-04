@@ -29,6 +29,8 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.momente = 0.01
+        self.gamma = nn.Parameter(torch.ones([out_channels]),requires_grad=True)
+        self.beta = nn.Parameter(torch.zeros([1,out_channels,1,1]),requires_grad=True)
 
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
@@ -43,11 +45,11 @@ class Conv2d_new(nn.Conv2d):
         shape_2d = (1,out1.shape[1],1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
         var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
+            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)*self.gamma
         weight = (1-self.momente) * (weight/(torch.sqrt(var+eps))) + (self.momente)*self.weight
         real_out = F.conv2d(x, weight, \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
-        return real_out
+        return real_out+self.beta
 
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
