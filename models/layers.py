@@ -28,7 +28,7 @@ class Conv2d_new(nn.Conv2d):
         super(Conv2d_new, self).__init__(in_channels, out_channels, kernel_size, stride,
                                          padding, dilation, groups, bias)
 
-        self.momente = 0.1
+        self.momente = 0.5
 
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
