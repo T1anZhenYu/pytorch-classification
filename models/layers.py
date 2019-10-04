@@ -29,7 +29,7 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.momente = 0.01
-        self.gamma = nn.Parameter(torch.ones([out_channels]),requires_grad=True)
+        self.gamma = nn.Parameter(torch.ones([1,out_channels,1,1]),requires_grad=True)
         self.beta = nn.Parameter(torch.zeros([1,out_channels,1,1]),requires_grad=True)
 
 
