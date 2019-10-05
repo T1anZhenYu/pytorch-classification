@@ -38,9 +38,14 @@ class Conv2d_new(nn.Conv2d):
         weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
                                                     keepdim=True).mean(dim=3, keepdim=True)
 
+        total_num = x.shape[0] * x.shape[1] * x.shape[2] *x.shape[3]
+        estimate_max = 0.82 * torch.log(total_num)
+        real_max = torch.max(x)
 
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
+        estimate_mean = torch.sqrt(math.pi/2)/(estimate_max/real_max)
+        x = x - estimate_mean
         weight = weight - weight_mean
         eps = 1e-5
         shape_2d = (1,out1.shape[1],1, 1)
