@@ -40,8 +40,9 @@ class Conv2d_new(nn.Conv2d):
 
         total_num = x.shape[0] * x.shape[1] * x.shape[2] *x.shape[3]
         estimate_max = (0.82 * torch.log(torch.tensor(total_num,dtype= torch.float))).cuda()
-        real_max = torch.max(x).cuda()
-
+        real_max = torch.max(x,dim=1)[0].cuda()
+        print('x shape:',x.shape)
+        print('real_max shape:',real_max.shape)
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
         estimate_mean = (torch.sqrt(torch.tensor(math.pi/2)).cuda()/\
