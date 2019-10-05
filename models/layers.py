@@ -31,7 +31,7 @@ class Conv2d_new(nn.Conv2d):
         self.momente = 0.01
         self.gamma = nn.Parameter(torch.ones([1,out_channels,1,1]),requires_grad=True)
         self.beta = nn.Parameter(torch.zeros([1,out_channels,1,1]),requires_grad=True)
-
+        self.eps = 1e-5
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
         weight = self.weight
@@ -44,15 +44,15 @@ class Conv2d_new(nn.Conv2d):
 
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
-        estimate_mean = torch.sqrt(math.pi/2)/(estimate_max/real_max)
+        estimate_mean = torch.sqrt(math.pi/2)/(estimate_max/real_max+self.eps)
         x = x - estimate_mean
         weight = weight - weight_mean
-        eps = 1e-5
+
         shape_2d = (1,out1.shape[1],1, 1)
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
         var = torch.transpose(torch.mean(
             (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
-        weight = (1-self.momente) * (weight/(torch.sqrt(var+eps))) + (self.momente)*self.weight
+        weight = (1-self.momente) * (weight/(torch.sqrt(var+self.eps))) + (self.momente)*self.weight
         real_out = F.conv2d(x, weight, \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
         return self.gamma*real_out+self.beta
