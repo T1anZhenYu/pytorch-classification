@@ -45,8 +45,8 @@ class Conv2d_new(nn.Conv2d):
         out1 = F.conv2d(x, weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
         shape_2d = (1,out1.shape[1],1, 1)
-        estimate_mean = (torch.sqrt(torch.tensor(math.pi/2)).cuda()/\
-                        (estimate_max/real_max+self.eps)).view([1,x.shape[1],1,1]).cuda()
+        # estimate_mean = (torch.sqrt(torch.tensor(math.pi/2)).cuda()/\
+        #                 (estimate_max/real_max+self.eps)).view([1,x.shape[1],1,1]).cuda()
         x = (x - torch.mean(x)).cuda()
         weight = weight - weight_mean
 
