@@ -29,7 +29,7 @@ class Conv2d_new(nn.Conv2d):
                                          padding, dilation, groups, bias)
 
         self.momente = 0.01
-        self.gamma = nn.Parameter(torch.ones([out_channels,1,1,1]),requires_grad=True)
+        self.gamma = nn.Parameter(torch.ones([1,out_channels,1,1]),requires_grad=True)
         self.beta = nn.Parameter(torch.zeros([1,out_channels,1,1]),requires_grad=True)
 
 
@@ -49,7 +49,7 @@ class Conv2d_new(nn.Conv2d):
         weight = (1-self.momente) * (weight/(torch.sqrt(var+eps))) + (self.momente)*self.weight
         real_out = F.conv2d(x, weight, \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
-        return real_out+self.beta
+        return self.gamma*real_out+self.beta
 
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
