@@ -39,7 +39,7 @@ class Conv2d_new(nn.Conv2d):
                                                     keepdim=True).mean(dim=3, keepdim=True)
 
         total_num = x.shape[0] * x.shape[1] * x.shape[2] *x.shape[3]
-        estimate_max = 0.82 * torch.log(total_num)
+        estimate_max = 0.82 * torch.log(torch.tensor(total_num))
         real_max = torch.max(x)
 
         out1 = F.conv2d(x, weight, self.bias, self.stride,
