@@ -35,8 +35,8 @@ class Conv2d_new(nn.Conv2d):
 
     def forward(self, x):  # return super(Conv2d, self).forward(x)
         weight = self.weight
-        weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
-                                                    keepdim=True).mean(dim=3, keepdim=True)
+        # weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
+        #                                             keepdim=True).mean(dim=3, keepdim=True)
 
         # total_num = x.shape[0] * x.shape[1] * x.shape[2] *x.shape[3]
         # estimate_max = (0.82 * torch.log(torch.tensor(total_num,dtype= torch.float))).cuda()
@@ -48,16 +48,17 @@ class Conv2d_new(nn.Conv2d):
         # estimate_mean = (torch.sqrt(torch.tensor(math.pi/2)).cuda()/\
         #                 (estimate_max/real_max+self.eps)).view([1,x.shape[1],1,1]).cuda()
 
-        weight = weight - weight_mean
+        # weight = weight - weight_mean
 
 
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
         var = torch.transpose(torch.mean(
             (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
-        weight = (1-self.momente) * (weight/(torch.sqrt(var+self.eps))) + (self.momente)*self.weight
+        weight = weight /(torch.sqrt(var+self.eps))
+        # weight = (1-self.momente) * (weight/(torch.sqrt(var+self.eps))) + (self.momente)*self.weight
         real_out = F.conv2d(x, weight, \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
-        return (real_out)
+        return (real_out-mu/(torch.sqrt(var+self.eps)))
 
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
