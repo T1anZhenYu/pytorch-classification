@@ -52,13 +52,14 @@ class Conv2d_new(nn.Conv2d):
 
 
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
-        var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
-        weight = weight /(torch.sqrt(var+self.eps))
+        var = torch.mean(
+            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d)
+        return (out1-mu)/torch.sqrt(var+self.eps)
+        # weight = weight /(torch.sqrt(var+self.eps))
         # weight = (1-self.momente) * (weight/(torch.sqrt(var+self.eps))) + (self.momente)*self.weight
-        real_out = F.conv2d(x, weight, \
-                        self.bias, self.stride,self.padding, self.dilation, self.groups)
-        return self.gamma*(real_out-mu/(torch.transpose(torch.sqrt(var+self.eps),0,1)))
+        # real_out = F.conv2d(x, weight, \
+        #                 self.bias, self.stride,self.padding, self.dilation, self.groups)
+        # return self.gamma*(real_out-mu/(torch.transpose(torch.sqrt(var+self.eps),0,1)))
 
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
