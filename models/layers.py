@@ -37,7 +37,7 @@ class Conv2d_new(nn.Conv2d):
         weight = self.weight
         weight_mean = weight.mean(dim=1, keepdim=True).mean(dim=2,
                                                     keepdim=True).mean(dim=3, keepdim=True)
-        x_mean = x.mean(dim=1,keepdim=True).mean(dim=2,keepdim=True).mean(dim=3,keepdim=True)
+
         # total_num = x.shape[0] * x.shape[1] * x.shape[2] *x.shape[3]
         # estimate_max = (0.82 * torch.log(torch.tensor(total_num,dtype= torch.float))).cuda()
         # real_max = torch.max(x).cuda()
@@ -48,8 +48,7 @@ class Conv2d_new(nn.Conv2d):
         # estimate_mean = (torch.sqrt(torch.tensor(math.pi/2)).cuda()/\
         #                 (estimate_max/real_max+self.eps)).view([1,x.shape[1],1,1]).cuda()
 
-        x = (x - x_mean).cuda()
-        weight = weight - weight_mean
+        #weight = weight - weight_mean
 
 
         mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
