@@ -51,14 +51,14 @@ class Conv2d_new(nn.Conv2d):
         # weight = weight - weight_mean
 
 
-        mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d).detach()
+        mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
         var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1).detach()
+            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
         weight = weight /(torch.sqrt(var+self.eps))
         # weight = (1-self.momente) * (weight/(torch.sqrt(var+self.eps))) + (self.momente)*self.weight
         real_out = F.conv2d(x, weight, \
                         self.bias, self.stride,self.padding, self.dilation, self.groups)
-        return real_out-mu/(torch.transpose(torch.sqrt(var+self.eps),0,1))
+        return self.gamma*(real_out-mu/(torch.transpose(torch.sqrt(var+self.eps),0,1)))
 
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
