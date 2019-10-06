@@ -51,9 +51,9 @@ class Conv2d_new(nn.Conv2d):
         # weight = weight - weight_mean
 
 
-        mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d)
+        mu = torch.mean(out1, dim=(0, 2, 3)).view(shape_2d).detach()
         var = torch.transpose(torch.mean(
-            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1)
+            (out1 - mu) ** 2, dim=(0, 2, 3)).view(shape_2d), 0, 1).detach()
         weight = weight /(torch.sqrt(var+self.eps))
         # weight = (1-self.momente) * (weight/(torch.sqrt(var+self.eps))) + (self.momente)*self.weight
         real_out = F.conv2d(x, weight, \
