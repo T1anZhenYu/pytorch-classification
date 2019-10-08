@@ -150,4 +150,4 @@ class Conv2d_new(nn.Conv2d):
         # return self.gamma*(real_out-mu/(torch.transpose(torch.sqrt(var+self.eps),0,1)))
 
 def BatchNorm2d(num_features):
-    return nn.GroupNorm(num_channels=num_features, num_groups=32)
+    return nn.GroupNorm(num_channels=num_features, num_groups=16)
