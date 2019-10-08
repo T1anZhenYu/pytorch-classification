@@ -11,8 +11,12 @@ class GroupNorm(nn.Module):
         self.bias = nn.Parameter(torch.zeros(1,num_features,1,1))
         self.num_groups = num_groups
         self.eps = eps
-        self.moving_mean = torch.zeros(num_features).cuda()
-        self.moving_var = torch.ones(num_features).cuda()
+        if num_groups > num_features:
+            self.moving_mean = torch.zeros(num_features).cuda()
+            self.moving_var = torch.ones(num_features).cuda()
+        else:
+            self.moving_mean = torch.zeros(num_groups).cuda()
+            self.moving_var = torch.ones(num_groups).cuda()
         self.momente = 0.9
     def forward(self, x):
         N,C,H,W = x.size()
