@@ -27,10 +27,10 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes, stride)
-        self.bn1 = L.GroupNorm(planes)
+        self.bn1 = L.GroupNorm(planes,planes)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
-        self.bn2 = L.GroupNorm(planes)
+        self.bn2 = L.GroupNorm(planes,planes)
         self.downsample = downsample
         self.stride = stride
         self.iter = nn.Parameter(torch.zeros(1),requires_grad=False)
@@ -64,12 +64,12 @@ class Bottleneck(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = L.GroupNorm(planes)
+        self.bn1 = L.GroupNorm(planes,planes)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
                                padding=1, bias=False)
-        self.bn2 = L.GroupNorm(planes)
+        self.bn2 = L.GroupNorm(planes,planes)
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
-        self.bn3 = L.GroupNorm(planes * 4)
+        self.bn3 = L.GroupNorm(planes * 4,planes * 4)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
@@ -117,7 +117,7 @@ class ResNet_MYBN(nn.Module):
         self.inplanes = 16
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
                                bias=False)
-        self.bn1 = L.GroupNorm(16)
+        self.bn1 = L.GroupNorm(16,16)
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
         self.layer2 = self._make_layer(block, 32, n, stride=2)
@@ -139,7 +139,7 @@ class ResNet_MYBN(nn.Module):
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
                           kernel_size=1, stride=stride, bias=False),
-                L.GroupNorm(planes * block.expansion),
+                L.GroupNorm(planes * block.expansion,planes * block.expansion),
             )
 
         layers = []
