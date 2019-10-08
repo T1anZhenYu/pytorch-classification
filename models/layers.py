@@ -11,7 +11,9 @@ class GroupNorm(nn.Module):
         self.bias = nn.Parameter(torch.zeros(1,num_features,1,1))
         self.num_groups = num_groups
         self.eps = eps
-
+        self.moving_mean = torch.zeros(self.num_features)
+        self.moving_var = torch.ones(self.num_features)
+        self.momente = 0.9
     def forward(self, x):
         N,C,H,W = x.size()
         G = self.num_groups
@@ -21,9 +23,14 @@ class GroupNorm(nn.Module):
         assert C % G == 0
 
         x = x.view(N,G,-1)
-        mean = x.mean(-1, keepdim=True)
-        var = x.var(-1, keepdim=True)
+        temp_mean = x.mean(-1, keepdim=True)
+        temp_var = x.var(-1, keepdim=True)
+        mean = temp_mean*(1-self.momente) + self.momente*self.moving_mean
 
+        var = temp_var*(1-self.momente) + self.moving_var*self.momente
+        if self.training:
+            self.moving_mean = mean
+            self.moving_var = var
         x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
