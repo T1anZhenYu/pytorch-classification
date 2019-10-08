@@ -13,7 +13,7 @@ import math
 import numpy as np
 import time
 from .. import layers as L
-__all__ = ['resnet_offical_GN']
+__all__ = ['resnet_offcial_GN']
 
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -166,7 +166,7 @@ class ResNet_offcial_GN(nn.Module):
         return x
 
 
-def resnet_offical_GN(**kwargs):
+def resnet_offcial_GN(**kwargs):
     """
     Constructs a ResNet model.
     """
