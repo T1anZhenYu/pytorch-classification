@@ -184,6 +184,12 @@ def main():
                     depth=args.depth,
                     block_name=args.block_name,
                 )
+    elif args.arch.endswith('resnet_mybn'):
+        model = models.__dict__[args.arch](
+                    num_classes=num_classes,
+                    depth=args.depth,
+                    block_name=args.block_name,
+                )
     else:
         model = models.__dict__[args.arch](num_classes=num_classes)
 
