@@ -29,12 +29,14 @@ class GroupNorm(nn.Module):
         x = x.view(N,G,-1)
         temp_mean = x.mean(-1, keepdim=True)
         temp_var = x.var(-1, keepdim=True)
-        mean = temp_mean*(1-self.momente) + self.momente*self.moving_mean
+        mean = temp_mean*(self.momente) + (1-self.momente)*self.moving_mean
 
-        var = temp_var*(1-self.momente) + self.moving_var*self.momente
+        var = temp_var*(self.momente) + self.moving_var*(1-self.momente)
         if self.training:
-            self.moving_mean = mean.detach()
-            self.moving_var = var.detach()
+            self.moving_mean = (temp_mean * (1-self.momente) +
+                                self.momente * self.moving_mean).detach()
+            self.moving_var = (temp_var*(1-self.momente) +
+                               self.moving_var * self.momente).detach()
         x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
