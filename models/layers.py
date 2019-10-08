@@ -33,8 +33,8 @@ class GroupNorm(nn.Module):
 
         var = temp_var*(1-self.momente) + self.moving_var*self.momente
         if self.training:
-            self.moving_mean = mean
-            self.moving_var = var
+            self.moving_mean = mean.detach()
+            self.moving_var = var.detach()
         x = (x-mean) / (var+self.eps).sqrt()
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
