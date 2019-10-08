@@ -13,7 +13,7 @@ import math
 import numpy as np
 import time
 from .. import layers as L
-__all__ = ['resnet_offcial_GN']
+__all__ = ['resnet_official_GN']
 
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -97,10 +97,10 @@ class Bottleneck(nn.Module):
         return out
 
 
-class ResNet_offcial_GN(nn.Module):
+class ResNet_official_GN(nn.Module):
 
     def __init__(self, depth, num_classes=1000, block_name='BasicBlock'):
-        super(ResNet_offcial_GN, self).__init__()
+        super(ResNet_official_GN, self).__init__()
         # Model type specifies number of layers for CIFAR-10 model
         if block_name.lower() == 'basicblock':
             assert (depth - 2) % 6 == 0, 'When use basicblock, depth should be 6n+2, e.g. 20, 32, 44, 56, 110, 1202'
@@ -166,8 +166,8 @@ class ResNet_offcial_GN(nn.Module):
         return x
 
 
-def resnet_offcial_GN(**kwargs):
+def resnet_official_GN(**kwargs):
     """
     Constructs a ResNet model.
     """
-    return ResNet_offcial_GN(**kwargs)
+    return ResNet_official_GN(**kwargs)

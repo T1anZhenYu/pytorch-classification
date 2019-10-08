@@ -60,7 +60,7 @@ Densenet-161             22.35           6.20
 .. _SqueezeNet: https://arxiv.org/abs/1602.07360
 .. _DenseNet: https://arxiv.org/abs/1608.06993
 """
-from .resnet_offcial_GN import *
+from .resnet_official_GN import *
 from .alexnet import *
 from .vgg import *
 from .resnet import *

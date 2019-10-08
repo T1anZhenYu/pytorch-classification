@@ -190,7 +190,7 @@ def main():
                     depth=args.depth,
                     block_name=args.block_name,
                 )
-    elif args.arch.endswith('resnet_offical_GN'):
+    elif args.arch.endswith('resnet_official_GN'):
         model = models.__dict__[args.arch](
                     num_classes=num_classes,
                     depth=args.depth,
