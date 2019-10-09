@@ -54,7 +54,7 @@ class BasicBlock(nn.Module):
             dic['afterBN'] = out3.detach().cpu().numpy()
             dic['weight'] = self.conv2.weight.detach().cpu().numpy()
             dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
-            dic['iter'] = self.iter
+            dic['iter'] = self.iter.detach().cpu().numpy()
             np.savez(str(time.time()) + '.npz', **dic)
         self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
 
