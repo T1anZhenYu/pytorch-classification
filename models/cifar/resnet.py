@@ -47,7 +47,7 @@ class BasicBlock(nn.Module):
         out2 = self.conv2(out1)
 
         out3 = self.bn2(out2)
-        print(self.iter[0])
+
         if self.iter[0] % 100 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels == 32:
             dic['input'] = out1.detach().cpu().numpy()
             dic['beforeBN'] = out2.detach().cpu().numpy()
