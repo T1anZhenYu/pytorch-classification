@@ -56,7 +56,7 @@ class BasicBlock(nn.Module):
             dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
             dic['iter'] = self.iter
             np.savez(str(time.time()) + '.npz', **dic)
-            self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
+        self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
 
         if self.downsample is not None:
             residual = self.downsample(x)
