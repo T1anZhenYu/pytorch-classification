@@ -53,9 +53,9 @@ class BasicBlock(nn.Module):
         out3 = self.bn2(out2)
 
         real_max = torch.max(out2)
-        estimate_max = 0.83*torch.sqrt(out2.shape[0]*out2.shape[1]*out2.shape[2]*out2.shape[3])
+        estimate_max = 0.83*math.sqrt(out2.shape[0]*out2.shape[1]*out2.shape[2]*out2.shape[3])
         alpha = real_max / estimate_max
-        estimate_mean = alpha * c_in * torch.sqrt(math.pi/2) * weight_mean
+        estimate_mean = alpha * c_in * math.sqrt(math.pi/2) * weight_mean
         self.estimate_mean = nn.Parameter(estimate_mean*0.1 + self.estimate_mean*0.9,requires_grad=True)
         estimate_var = alpha**2 * c_in**2 * math.pi /2 * weight_var
         self.estimate_var = nn.Parameter(estimate_var*0.1 + self.estimate_var*0.9,requires_grad=True)
