@@ -15,6 +15,7 @@ import time
 
 __all__ = ['resnet']
 
+
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -33,7 +34,8 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
-        self.iter = nn.Parameter(torch.zeros(1),requires_grad=False)
+        self.iter = nn.Parameter(torch.zeros(1), requires_grad=False)
+
     def forward(self, x):
         residual = x
         dic = {}
@@ -45,13 +47,13 @@ class BasicBlock(nn.Module):
 
         out3 = self.bn2(out2)
 
-        if self.iter%500 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels ==32:
+        if self.iter % 500 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels == 32:
             dic['input'] = out1.detach().cpu().numpy()
             dic['beforeBN'] = out2.detach().cpu().numpy()
             dic['afterBN'] = out3.detach().cpu().numpy()
             dic['weight'] = self.conv2.weight.detach().cpu().numpy()
             dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
-            np.savez(str(time.time())+'.npz',**dic)
+            np.savez(str(time.time()) + '.npz', **dic)
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -116,7 +118,6 @@ class ResNet(nn.Module):
         else:
             raise ValueError('block_name shoule be Basicblock or Bottleneck')
 
-
         self.inplanes = 16
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
                                bias=False)
@@ -156,7 +157,7 @@ class ResNet(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         x = self.bn1(x)
-        x = self.relu(x)    # 32x32
+        x = self.relu(x)  # 32x32
 
         x = self.layer1(x)  # 32x32
         x = self.layer2(x)  # 16x16
