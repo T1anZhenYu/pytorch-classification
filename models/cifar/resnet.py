@@ -39,21 +39,24 @@ class BasicBlock(nn.Module):
         dic = {}
         out = self.conv1(x)
         out = self.bn1(out)
-        out = self.relu(out)
-        #dic['input'] = out.detach().cpu().numpy()
-        out = self.conv2(out)
-        #dic['beforeBN'] = out.detach().cpu().numpy()
-        out = self.bn2(out)
-        # dic['afterBN'] = out.detach().cpu().numpy()
-        # dic['weight'] = self.conv2.weight.detach().cpu().numpy()
-        # dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
-        # if self.iter%50 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels ==32:
-        #     np.savez(str(time.time())+'.npz',**dic)
+        out1 = self.relu(out)
+
+        out2 = self.conv2(out1)
+
+        out3 = self.bn2(out2)
+
+        if self.iter%500 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels ==32:
+            dic['input'] = out1.detach().cpu().numpy()
+            dic['beforeBN'] = out2.detach().cpu().numpy()
+            dic['afterBN'] = out3.detach().cpu().numpy()
+            dic['weight'] = self.conv2.weight.detach().cpu().numpy()
+            dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
+            np.savez(str(time.time())+'.npz',**dic)
         if self.downsample is not None:
             residual = self.downsample(x)
 
-        out += residual
-        out = self.relu(out)
+        out3 += residual
+        out = self.relu(out3)
 
         return out
 
