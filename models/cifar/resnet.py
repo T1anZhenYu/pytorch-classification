@@ -37,6 +37,7 @@ class BasicBlock(nn.Module):
         self.iter = nn.Parameter(torch.ones([1]),requires_grad=False)
 
     def forward(self, x):
+        print(self.iter)
         residual = x
         dic = {}
         out = self.conv1(x)
