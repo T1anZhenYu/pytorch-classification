@@ -34,7 +34,7 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
-        self.iter = nn.Parameter(torch.zeros(1), requires_grad=False)
+        self.iter = 1
 
     def forward(self, x):
         residual = x
@@ -53,7 +53,10 @@ class BasicBlock(nn.Module):
             dic['afterBN'] = out3.detach().cpu().numpy()
             dic['weight'] = self.conv2.weight.detach().cpu().numpy()
             dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
+            dic['iter'] = self.iter
             np.savez(str(time.time()) + '.npz', **dic)
+            self.iter += 1
+
         if self.downsample is not None:
             residual = self.downsample(x)
 
