@@ -55,6 +55,7 @@ class BasicBlock(nn.Module):
             dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
             dic['iter'] = self.iter
             np.savez(str(time.time()) + '.npz', **dic)
+            print(self.iter)
             self.iter += 1
 
         if self.downsample is not None:
