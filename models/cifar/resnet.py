@@ -68,6 +68,8 @@ class BasicBlock(nn.Module):
         if self.iter[0] % 200 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels == 32:
             dic['running_estimate_mean'] = self.estimate_mean.detach().cpu().numpy()
             dic['running_estimate_var'] = self.estimate_var.detach().cpu().numpy()
+            dic['temp_estimate_mean'] = estimate_mean.detach().cpu().numpy()
+            dic['temp_estimate_var'] = estimate_var.detach().cpu().numpy()
             dic['input'] = out1.detach().cpu().numpy()
             dic['beforeBN'] = out2.detach().cpu().numpy()
             dic['afterBN'] = out3.detach().cpu().numpy()
