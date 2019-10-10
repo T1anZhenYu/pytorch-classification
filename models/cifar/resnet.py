@@ -52,7 +52,7 @@ class BasicBlock(nn.Module):
 
         out3 = self.bn2(out2)
 
-        real_max = torch.max(out2,dim=(0,2,3))
+        real_max = torch.max(torch.max(torch.max(out2,dim=0),dim=-1),dim=-1)
         estimate_max = 0.83*math.sqrt(out2.shape[0]*out2.shape[1]*out2.shape[2]*out2.shape[3])
         alpha = real_max / estimate_max
         estimate_mean = c_in * math.sqrt(math.pi/2) * weight_mean
