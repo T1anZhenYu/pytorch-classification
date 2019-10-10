@@ -59,6 +59,7 @@ class BasicBlock(nn.Module):
         estimate_var = alpha**2 * c_in**2 * math.pi /2 * weight_var
         if self.iter == 1:
             self.estimate_mean = nn.Parameter(estimate_mean,requires_grad=False)
+            self.estimate_var = nn.Parameter(estimate_var,requires_grad=False)
         else:
             self.estimate_mean = nn.Parameter(estimate_mean*0.1 + self.estimate_mean*0.9,requires_grad=False)
 
