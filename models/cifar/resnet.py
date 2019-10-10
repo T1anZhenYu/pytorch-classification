@@ -56,13 +56,17 @@ class BasicBlock(nn.Module):
         estimate_max = 0.83*math.sqrt(out2.shape[0]*out2.shape[1]*out2.shape[2]*out2.shape[3])
         alpha = real_max / estimate_max
         estimate_mean = alpha * c_in * math.sqrt(math.pi/2) * weight_mean
-        self.estimate_mean = nn.Parameter(estimate_mean*0.1 + self.estimate_mean*0.9,requires_grad=True)
         estimate_var = alpha**2 * c_in**2 * math.pi /2 * weight_var
-        self.estimate_var = nn.Parameter(estimate_var*0.1 + self.estimate_var*0.9,requires_grad=True)
+        if self.iter == 1:
+            self.estimate_mean = nn.Parameter(estimate_mean,requires_grad=False)
+        else:
+            self.estimate_mean = nn.Parameter(estimate_mean*0.1 + self.estimate_mean*0.9,requires_grad=False)
+
+            self.estimate_var = nn.Parameter(estimate_var*0.1 + self.estimate_var*0.9,requires_grad=False)
 
         if self.iter[0] % 200 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels == 32:
-            dic['estimate_mean'] = self.estimate_mean.detach().cpu().numpy()
-            dic['estimate_var'] = self.estimate_var.detach().cpu().numpy()
+            dic['running_estimate_mean'] = self.estimate_mean.detach().cpu().numpy()
+            dic['running_estimate_var'] = self.estimate_var.detach().cpu().numpy()
             dic['input'] = out1.detach().cpu().numpy()
             dic['beforeBN'] = out2.detach().cpu().numpy()
             dic['afterBN'] = out3.detach().cpu().numpy()
