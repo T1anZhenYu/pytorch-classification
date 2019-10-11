@@ -80,7 +80,7 @@ class BasicBlock(nn.Module):
             dic['weight_C'+str(self.conv1.out_channels)] = self.conv2.weight.detach().cpu().numpy()
             dic['conv1weight_C'+str(self.conv1.out_channels)] = self.conv1.weight.detach().cpu().numpy()
             dic['iter_C'+str(self.conv1.out_channels)] = self.iter.detach().cpu().numpy()
-            np.savez(str(time.time()) + '.npz', **dic)
+            np.savez(str(time.time()) + '_C'+str(self.conv1.out_channels)+'.npz', **dic)
         if self.training:
             self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
 
