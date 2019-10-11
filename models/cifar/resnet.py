@@ -28,10 +28,10 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes, stride)
-        self.bn1 = nn.BatchNorm2d(planes)
+        self.bn1 = nn.BatchNorm2d(planes,affine=False)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
-        self.bn2 = nn.BatchNorm2d(planes)
+        self.bn2 = nn.BatchNorm2d(planes,affine=False)
         self.downsample = downsample
         self.stride = stride
         self.iter = nn.Parameter(torch.ones([1]),requires_grad=False)
@@ -65,17 +65,21 @@ class BasicBlock(nn.Module):
 
             self.estimate_var = nn.Parameter(estimate_var*0.1 + self.estimate_var*0.9,requires_grad=False)
 
-        if self.iter[0] % 200 == 0 and self.conv1.in_channels == 16 and self.conv1.out_channels == 32:
-            dic['running_estimate_mean'] = self.estimate_mean.detach().cpu().numpy()
-            dic['running_estimate_var'] = self.estimate_var.detach().cpu().numpy()
-            dic['temp_estimate_mean'] = estimate_mean.detach().cpu().numpy()
-            dic['temp_estimate_var'] = estimate_var.detach().cpu().numpy()
-            dic['input'] = out1.detach().cpu().numpy()
-            dic['beforeBN'] = out2.detach().cpu().numpy()
-            dic['afterBN'] = out3.detach().cpu().numpy()
-            dic['weight'] = self.conv2.weight.detach().cpu().numpy()
-            dic['conv1weight'] = self.conv1.weight.detach().cpu().numpy()
-            dic['iter'] = self.iter.detach().cpu().numpy()
+        if self.iter[0] % 200 == 0 and self.conv1.in_channels != self.conv1.out_channels:
+            dic['running_estimate_mean_C'+str(self.conv1.out_channels)] = \
+                self.estimate_mean.detach().cpu().numpy()
+            dic['running_estimate_var_C'+str(self.conv1.out_channels)] = \
+                self.estimate_var.detach().cpu().numpy()
+            dic['temp_estimate_mean_C'+str(self.conv1.out_channels)] = \
+                estimate_mean.detach().cpu().numpy()
+            dic['temp_estimate_var_C'+str(self.conv1.out_channels)] = \
+                estimate_var.detach().cpu().numpy()
+            dic['input_C'+str(self.conv1.out_channels)] = out1.detach().cpu().numpy()
+            dic['beforeBN_C'+str(self.conv1.out_channels)] = out2.detach().cpu().numpy()
+            dic['afterBN_C'+str(self.conv1.out_channels)] = out3.detach().cpu().numpy()
+            dic['weight_C'+str(self.conv1.out_channels)] = self.conv2.weight.detach().cpu().numpy()
+            dic['conv1weight_C'+str(self.conv1.out_channels)] = self.conv1.weight.detach().cpu().numpy()
+            dic['iter_C'+str(self.conv1.out_channels)] = self.iter.detach().cpu().numpy()
             np.savez(str(time.time()) + '.npz', **dic)
         if self.training:
             self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
@@ -95,12 +99,12 @@ class Bottleneck(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
+        self.bn1 = nn.BatchNorm2d(planes,affine=False)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
                                padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
+        self.bn2 = nn.BatchNorm2d(planes,affine=False)
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(planes * 4)
+        self.bn3 = nn.BatchNorm2d(planes * 4,affine=False)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
@@ -147,7 +151,7 @@ class ResNet(nn.Module):
         self.inplanes = 16
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
                                bias=False)
-        self.bn1 = nn.BatchNorm2d(16)
+        self.bn1 = nn.BatchNorm2d(16,affine=False)
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
         self.layer2 = self._make_layer(block, 32, n, stride=2)
@@ -169,7 +173,7 @@ class ResNet(nn.Module):
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
                           kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(planes * block.expansion),
+                nn.BatchNorm2d(planes * block.expansion,affine=False),
             )
 
         layers = []
