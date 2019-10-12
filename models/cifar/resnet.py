@@ -65,7 +65,7 @@ class BasicBlock(nn.Module):
                                              self.estimate_var*0.9,requires_grad=False)
 
         if self.iter[0] % 200 == 0 and self.conv1.in_channels != self.conv1.out_channels:
-            dic['alpha_C'+str(alpha)] = alpha.detach().cpu().numpy()
+            dic['alpha_C'+str(self.conv1.out_channels)] = alpha.detach().cpu().numpy()
             dic['running_estimate_mean_C'+str(self.conv1.out_channels)] = \
                 self.estimate_mean.detach().cpu().numpy()
             dic['running_estimate_var_C'+str(self.conv1.out_channels)] = \
