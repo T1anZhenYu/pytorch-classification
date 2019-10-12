@@ -41,7 +41,7 @@ class GroupNorm(nn.Module):
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
 
-class StaticBatchNorm(nn.Module):
+class MyStaticBatchNorm(nn.Module):
     def __init__(self,num_features):
         self.num_features = num_features
     def forward(self, x,last_layer_weight,last_layer_input):
