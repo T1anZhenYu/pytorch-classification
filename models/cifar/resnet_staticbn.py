@@ -99,12 +99,12 @@ class Bottleneck(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None):
         super(Bottleneck, self).__init__()
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = L.MyStaticBatchNorm(planes)
+        self.bn1 = L.MyStaticBatchNorm(planes,True)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
                                padding=1, bias=False)
-        self.bn2 = L.MyStaticBatchNorm(planes)
+        self.bn2 = L.MyStaticBatchNorm(planes,False)
         self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
-        self.bn3 = L.MyStaticBatchNorm(planes * 4)
+        self.bn3 = L.MyStaticBatchNorm(planes * 4,False)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
