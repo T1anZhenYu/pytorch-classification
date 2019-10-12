@@ -42,8 +42,9 @@ class GroupNorm(nn.Module):
         return x * self.weight + self.bias
 
 class MyStaticBatchNorm(nn.Module):
-    def __init__(self,num_features):
+    def __init__(self,num_features,residual=True):
         super(MyStaticBatchNorm, self).__init__()
+        self.residual = residual
         self.num_features = num_features
         self.gamma = nn.Parameter(torch.Tensor(self.num_features), requires_grad=True)
     def forward(self, x,last_layer_weight,last_layer_input):
@@ -57,10 +58,16 @@ class MyStaticBatchNorm(nn.Module):
                                        last_layer_input.shape[2] * \
                                        last_layer_input.shape[3])
         alpha = real_max / estimate_max
-        estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean)\
-            .view([1,self.num_features,1,1])
-        estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)\
-            .view([1,self.num_features,1,1])
+        if self.residual:
+            estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean)\
+                .view([1,self.num_features,1,1])
+            estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)\
+                .view([1,self.num_features,1,1])
+        else:
+            estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean)/2\
+                .view([1,self.num_features,1,1])
+            estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)/4\
+                .view([1,self.num_features,1,1])
 
         return (x - estimate_mean)/torch.sqrt(estimate_var)
 
