@@ -41,6 +41,26 @@ class GroupNorm(nn.Module):
         x = x.view(N,C,H,W)
         return x * self.weight + self.bias
 
+class StaticBatchNorm(nn.Module):
+    def __init__(self,num_features):
+        self.num_features = num_features
+    def forward(self, x,last_layer_weight,last_layer_input):
+        c_in = last_layer_input.shape[1]
+        weight_mean = torch.mean(last_layer_weight,(1,2,3))
+        weight_var = torch.var(last_layer_weight,(1,2,3))
+        real_max = torch.max(torch.max(torch.max(last_layer_input,dim=0)[0]\
+                                       ,dim=-1)[0],dim=-1)[0]
+        estimate_max = 0.83 * math.log(last_layer_input.shape[0] * \
+                                       last_layer_input.shape[1] * \
+                                       last_layer_input.shape[2] * \
+                                       last_layer_input.shape[3])
+        alpha = real_max / estimate_max
+        estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean)\
+            .view([1,self.num_features,1,1])
+        estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)\
+            .view([1,self.num_features,1,1])
+
+        return (x - estimate_mean)/torch.sqrt(estimate_var)
 
 class MYBatchNorm(nn.Module):
     '''custom implement batch normalization with autograd by Antinomy
