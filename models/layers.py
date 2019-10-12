@@ -50,8 +50,8 @@ class MyStaticBatchNorm(nn.Module):
         c_in = last_layer_input.shape[1]
         weight_mean = torch.mean(last_layer_weight,(1,2,3))
         weight_var = torch.var(last_layer_weight,(1,2,3))
-        real_max = torch.max(torch.max(torch.max(last_layer_input,dim=0)[0]\
-                                       ,dim=-1)[0],dim=-1)[0]
+        real_max = torch.mean(torch.max(torch.max(torch.max(last_layer_input,dim=0)[0]\
+                                       ,dim=-1)[0],dim=-1)[0])
         estimate_max = 0.83 * math.log(last_layer_input.shape[0] * \
                                        last_layer_input.shape[1] * \
                                        last_layer_input.shape[2] * \
