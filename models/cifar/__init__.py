@@ -72,3 +72,4 @@ from .resnet_ws import *
 from .resnet_new_ws import *
 
 from .resnet_mybn import *
+from .resnet_staticbn import *
