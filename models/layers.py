@@ -44,7 +44,7 @@ class GroupNorm(nn.Module):
 class MyStaticBatchNorm(nn.Module):
     def __init__(self,num_features):
         self.num_features = num_features
-        self.gamma = nn.Parameter(torch.ones([num_features]))
+        self.gamma = nn.Parameter(torch.Tensor(self.num_features), requires_grad=True)
     def forward(self, x,last_layer_weight,last_layer_input):
         c_in = last_layer_input.shape[1]
         weight_mean = torch.mean(last_layer_weight,(1,2,3))
