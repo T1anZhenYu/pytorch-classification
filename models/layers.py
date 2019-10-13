@@ -48,10 +48,10 @@ class MyStaticBatchNorm(nn.Module):
         self.num_features = num_features
         self.eps = 1e-5
         self.momente = 0.9
-        self.running_weight_mean = nn.Parameter(torch.zeros([1,self.num_features,1,1])\
+        self.running_weight_mean = nn.Parameter(torch.zeros([self.num_features])\
                                                 ,requires_grad=False)
 
-        self.running_weight_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1])\
+        self.running_weight_var = nn.Parameter(torch.ones([self.num_features])\
                                                ,requires_grad=False)
         self.alpha = 1
     def forward(self, x,last_layer_weight,last_layer_input):
