@@ -61,7 +61,6 @@ class MyStaticBatchNorm(nn.Module):
         if self.training:
             weight_mean = self.momente * self.running_weight_mean + (1 - self.momente) * \
                 temp_weight_mean
-            print('weightmean shape:',weight_mean.shape)
             weight_var = self.momente * self.running_weight_var + (1 - self.momente) * \
                 temp_weight_var
             self.running_weight_mean = nn.Parameter(weight_mean,requires_grad=False)
