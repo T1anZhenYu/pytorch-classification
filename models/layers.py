@@ -58,13 +58,14 @@ class MyStaticBatchNorm(nn.Module):
                                        last_layer_input.shape[2] * \
                                        last_layer_input.shape[3])
         alpha = real_max / estimate_max
+
         if self.residual:
-            estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean*2)\
+            estimate_mean = (alpha * c_in * math.sqrt(math.pi / 2) * weight_mean*2)\
                 .view([1,self.num_features,1,1])
             estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var*4)\
                 .view([1,self.num_features,1,1])
         else:
-            estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean)\
+            estimate_mean = (alpha * c_in * math.sqrt(math.pi / 2) * weight_mean)\
                 .view([1,self.num_features,1,1])
             estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)\
                 .view([1,self.num_features,1,1])
