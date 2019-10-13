@@ -48,14 +48,26 @@ class MyStaticBatchNorm(nn.Module):
         self.num_features = num_features
         self.eps = 1e-5
         self.momente = 0.9
-        self.running_mean = nn.Parameter(torch.zeros([1,self.num_features,1,1]))
+        self.running_weight_mean = nn.Parameter(torch.zeros([1,self.num_features,1,1])\
+                                                ,requires_grad=False)
 
-        self.running_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
+        self.running_weight_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1])\
+                                               ,requires_grad=False)
         self.alpha = 1
     def forward(self, x,last_layer_weight,last_layer_input):
         c_in = last_layer_input.shape[1]
-        weight_mean = torch.mean(last_layer_weight,(1,2,3))
-        weight_var = torch.var(last_layer_weight,(1,2,3))
+        temp_weight_mean = torch.mean(last_layer_weight,(1,2,3))
+        temp_weight_var = torch.var(last_layer_weight,(1,2,3))
+        if self.training:
+            weight_mean = self.momente * self.running_weight_mean + (1 - self.momente) * \
+                temp_weight_mean
+            weight_var = self.momente * self.running_weight_var + (1 - self.momente) * \
+                temp_weight_var
+            self.running_weight_mean = nn.Parameter(weight_mean,requires_grad=False)
+            self.running_weight_var = nn.Parameter(weight_var,requires_grad=False)
+        else:
+            weight_mean = temp_weight_mean
+            weight_var = temp_weight_var
         real_max = torch.mean(torch.max(torch.max(torch.max(last_layer_input,dim=0)[0]\
                                        ,dim=-1)[0],dim=-1)[0])
         estimate_max = 0.83 * math.log(last_layer_input.shape[0] * \
@@ -75,19 +87,8 @@ class MyStaticBatchNorm(nn.Module):
                 .view([1,self.num_features,1,1])
             estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)\
                 .view([1,self.num_features,1,1])
-        if self.training:
-            self.running_mean = nn.Parameter(self.momente*self.running_mean +\
-                                             (1-self.momente)*estimate_mean)
-            self.running_var = nn.Parameter(self.running_var*self.momente + \
-                                            (1-self.momente)* estimate_var)
-            return (x - self.running_mean)/torch.sqrt(self.running_var+self.eps)
-        else :
-            temp_estimate_mean = self.running_mean*self.momente + \
-                                 (1-self.momente)*estimate_mean
-            temp_estimate_var = self.running_var * self.momente + \
-                                (1-self.momente) * estimate_var
-            return (x - temp_estimate_mean)/torch.sqrt(temp_estimate_var + self.eps)
 
+        return (x - estimate_mean)/torch.sqrt(estimate_var+self.eps)
 class MYBatchNorm(nn.Module):
     '''custom implement batch normalization with autograd by Antinomy
     '''
