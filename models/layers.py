@@ -63,7 +63,7 @@ class MyStaticBatchNorm(nn.Module):
                                        last_layer_input.shape[3])
         alpha = real_max / estimate_max
 
-        real_mean = torch.mean(x,(0,2,3)).view([1,self.num_features,1,1])
+        # real_mean = torch.mean(x,(0,2,3)).view([1,self.num_features,1,1])
         if self.residual:
             estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean*2)\
                 .view([1,self.num_features,1,1])
