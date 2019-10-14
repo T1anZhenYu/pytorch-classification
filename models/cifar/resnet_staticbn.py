@@ -12,10 +12,11 @@ import torch.nn as nn
 import math
 import numpy as np
 import time
+from torch.utils.tensorboard import SummaryWriter
 from .. import layers as L
 __all__ = ['resnet_staticbn']
 
-
+writer = SummaryWriter('tensorboard_data')
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -34,7 +35,7 @@ class BasicBlock(nn.Module):
         self.bn2 = L.MyStaticBatchNorm(planes,False)
         self.downsample = downsample
         self.stride = stride
-        # self.iter = nn.Parameter(torch.ones([1]),requires_grad=False)
+        self.iter = 1
         # self.estimate_mean = nn.Parameter(torch.zeros([planes]))
         # self.estimate_var = nn.Parameter(torch.ones([planes]))
     def forward(self, x):
@@ -42,6 +43,9 @@ class BasicBlock(nn.Module):
         residual = x
 
         out = self.conv1(x)
+        writer.add_histogram(tag='input',values=x,global_step=self.iter)
+        writer.add_histogram(tag='conv1_weight', values=self.conv1.weight,\
+                             global_step=self.iter)
         out = self.bn1(out,self.conv1.weight,x)
         out1 = self.relu(out)
         out2 = self.conv2(out1)
@@ -86,7 +90,7 @@ class BasicBlock(nn.Module):
 
         if self.downsample is not None:
             residual = self.downsample(x)
-
+        self.iter += 1
         out3 += residual
         out = self.relu(out3)
 
