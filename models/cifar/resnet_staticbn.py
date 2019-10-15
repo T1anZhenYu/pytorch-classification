@@ -44,12 +44,12 @@ class BasicBlock(nn.Module):
 
         out = self.conv1(x)
 
-        out = self.bn1(out,self.conv1.weight,x)
-        out1 = self.relu(out)
+        out0 = self.bn1(out,self.conv1.weight,x)
+        out1 = self.relu(out0)
         out2 = self.conv2(out1)
         out3 = self.bn2(out2,self.conv2.weight,out1)
         if self.training and self.iter % 200 == 0:
-            writer.add_histogram(tag='beforeRELU',values=out,global_step=self.iter)
+            writer.add_histogram(tag='beforeRELU',values=out0,global_step=self.iter)
             writer.add_histogram(tag='afterRELU',values=out1,global_step=self.iter)
             writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
                                  global_step=self.iter)
