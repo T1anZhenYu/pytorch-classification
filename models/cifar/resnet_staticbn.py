@@ -49,11 +49,11 @@ class BasicBlock(nn.Module):
         out2 = self.conv2(out1)
         out3 = self.bn2(out2,self.conv2.weight,out1)
         if self.training and self.iter % 200 == 0:
-            writer.add_histogram(tag='beforeRELU',values=out0,global_step=self.iter)
-            writer.add_histogram(tag='afterRELU',values=out1,global_step=self.iter)
+            writer.add_histogram(tag='input',values=out1,global_step=self.iter)
             writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
                                  global_step=self.iter)
             writer.add_histogram(tag='output',values=out2,global_step=self.iter)
+            writer.add_histogram(tag='afterBN',values=out3,global_step=self.iter)
         # c_in = self.conv1.out_channels
         # weight_mean = torch.mean(self.conv2.weight,(1,2,3))
         # weight_var = torch.var(self.conv2.weight,(1,2,3))
@@ -95,9 +95,9 @@ class BasicBlock(nn.Module):
             residual = self.downsample(x)
         self.iter += 1
         out3 += residual
-        out = self.relu(out3)
+        out4 = self.relu(out3)
 
-        return out
+        return out4
 
 
 class Bottleneck(nn.Module):
