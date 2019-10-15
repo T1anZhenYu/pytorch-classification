@@ -43,15 +43,17 @@ class BasicBlock(nn.Module):
         residual = x
 
         out = self.conv1(x)
-        if self.training and self.iter % 200 == 0:
-            writer.add_histogram(tag='input',values=x,global_step=self.iter)
-            writer.add_histogram(tag='conv1_weight', values=self.conv1.weight,\
-                                 global_step=self.iter)
+
         out = self.bn1(out,self.conv1.weight,x)
         out1 = self.relu(out)
         out2 = self.conv2(out1)
         out3 = self.bn2(out2,self.conv2.weight,out1)
-
+        if self.training and self.iter % 200 == 0:
+            writer.add_histogram(tag='beforeRELU',values=out,global_step=self.iter)
+            writer.add_histogram(tag='afterRELU',values=out1,global_step=self.iter)
+            writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
+                                 global_step=self.iter)
+            writer.add_histogram(tag='output',values=out2,global_step=self.iter)
         # c_in = self.conv1.out_channels
         # weight_mean = torch.mean(self.conv2.weight,(1,2,3))
         # weight_var = torch.var(self.conv2.weight,(1,2,3))
