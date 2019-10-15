@@ -43,9 +43,10 @@ class BasicBlock(nn.Module):
         residual = x
 
         out = self.conv1(x)
-        writer.add_histogram(tag='input',values=x,global_step=self.iter)
-        writer.add_histogram(tag='conv1_weight', values=self.conv1.weight,\
-                             global_step=self.iter)
+        if self.training and self.iter % 200 == 0:
+            writer.add_histogram(tag='input',values=x,global_step=self.iter)
+            writer.add_histogram(tag='conv1_weight', values=self.conv1.weight,\
+                                 global_step=self.iter)
         out = self.bn1(out,self.conv1.weight,x)
         out1 = self.relu(out)
         out2 = self.conv2(out1)
