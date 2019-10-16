@@ -52,6 +52,7 @@ class BasicBlock(nn.Module):
                                  global_step=self.iter)
             writer.add_histogram(tag='output',values=out4,global_step=self.iter)
             writer.add_histogram(tag='afterBN',values=out5,global_step=self.iter)
+        self.iter += 1
         # dic = {}
         # c_in = self.conv1.in_channels
         # weight_mean = torch.mean(self.conv1.weight,(1,2,3))
