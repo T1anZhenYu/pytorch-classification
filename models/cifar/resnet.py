@@ -12,10 +12,10 @@ import torch.nn as nn
 import math
 import numpy as np
 import time
-
+from torch.utils.tensorboard import SummaryWriter
 __all__ = ['resnet']
 
-
+writer = SummaryWriter('tensorboard_data')
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -34,9 +34,10 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes,affine=False)
         self.downsample = downsample
         self.stride = stride
-        self.iter = nn.Parameter(torch.ones([1]),requires_grad=False)
-        self.estimate_mean = nn.Parameter(torch.zeros([planes]))
-        self.estimate_var = nn.Parameter(torch.ones([planes]))
+        self.iter = 1
+        # self.iter = nn.Parameter(torch.ones([1]),requires_grad=False)
+        # self.estimate_mean = nn.Parameter(torch.zeros([planes]))
+        # self.estimate_var = nn.Parameter(torch.ones([planes]))
     def forward(self, x):
 
         residual = x
@@ -45,44 +46,49 @@ class BasicBlock(nn.Module):
         out3 = self.relu(out2)
         out4 = self.conv2(out3)
         out5 = self.bn2(out4)
-
-        dic = {}
-        c_in = self.conv1.in_channels
-        weight_mean = torch.mean(self.conv1.weight,(1,2,3))
-        weight_var = torch.var(self.conv1.weight,(1,2,3))
-        real_max = torch.mean(torch.max(torch.max(torch.max(x,dim=0)[0],dim=-1)[0],dim=-1)[0])
-        estimate_max = 0.83*math.log(x.shape[0]*x.shape[1]*x.shape[2]*x.shape[3])
-        alpha = real_max / estimate_max
-        estimate_mean = c_in * math.sqrt(math.pi/2) * weight_mean
-        estimate_var = alpha**2 * c_in**2 * math.pi / 2 * weight_var
-        if self.iter == 1:
-            self.estimate_mean = nn.Parameter(estimate_mean,requires_grad=False)
-            self.estimate_var = nn.Parameter(estimate_var,requires_grad=False)
-        else:
-            self.estimate_mean = nn.Parameter(estimate_mean*0.1 + \
-                                              self.estimate_mean*0.9,requires_grad=False)
-            self.estimate_var = nn.Parameter(estimate_var*0.1 + \
-                                             self.estimate_var*0.9,requires_grad=False)
-
-        if self.iter[0] % 200 == 0 and self.conv1.in_channels == 64:
-            dic['cin'] = c_in
-            dic['alpha_C'+str(self.conv1.out_channels)] = alpha.detach().cpu().numpy()
-            dic['running_estimate_mean_C'+str(self.conv1.out_channels)] = \
-                self.estimate_mean.detach().cpu().numpy()
-            dic['running_estimate_var_C'+str(self.conv1.out_channels)] = \
-                self.estimate_var.detach().cpu().numpy()
-            dic['temp_estimate_mean_C'+str(self.conv1.out_channels)] = \
-                estimate_mean.detach().cpu().numpy()
-            dic['temp_estimate_var_C'+str(self.conv1.out_channels)] = \
-                estimate_var.detach().cpu().numpy()
-            dic['input_C'+str(self.conv1.out_channels)] = x.detach().cpu().numpy()
-            dic['beforeBN_C'+str(self.conv1.out_channels)] = out1.detach().cpu().numpy()
-            dic['afterBN_C'+str(self.conv1.out_channels)] = out2.detach().cpu().numpy()
-            dic['weight_C'+str(self.conv1.out_channels)] = self.conv1.weight.detach().cpu().numpy()
-            dic['iter_C'+str(self.conv1.out_channels)] = self.iter.detach().cpu().numpy()
-            np.savez(str(time.time()) + '_C'+str(self.conv1.out_channels)+'.npz', **dic)
-        if self.training:
-            self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
+        if self.iter %200 == 1 and self.training:
+            writer.add_histogram(tag='input',values=out3,global_step=self.iter)
+            writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
+                                 global_step=self.iter)
+            writer.add_histogram(tag='output',values=out4,global_step=self.iter)
+            writer.add_histogram(tag='afterBN',values=out5,global_step=self.iter)
+        # dic = {}
+        # c_in = self.conv1.in_channels
+        # weight_mean = torch.mean(self.conv1.weight,(1,2,3))
+        # weight_var = torch.var(self.conv1.weight,(1,2,3))
+        # real_max = torch.mean(torch.max(torch.max(torch.max(x,dim=0)[0],dim=-1)[0],dim=-1)[0])
+        # estimate_max = 0.83*math.log(x.shape[0]*x.shape[1]*x.shape[2]*x.shape[3])
+        # alpha = real_max / estimate_max
+        # estimate_mean = c_in * math.sqrt(math.pi/2) * weight_mean
+        # estimate_var = alpha**2 * c_in**2 * math.pi / 2 * weight_var
+        # if self.iter == 1:
+        #     self.estimate_mean = nn.Parameter(estimate_mean,requires_grad=False)
+        #     self.estimate_var = nn.Parameter(estimate_var,requires_grad=False)
+        # else:
+        #     self.estimate_mean = nn.Parameter(estimate_mean*0.1 + \
+        #                                       self.estimate_mean*0.9,requires_grad=False)
+        #     self.estimate_var = nn.Parameter(estimate_var*0.1 + \
+        #                                      self.estimate_var*0.9,requires_grad=False)
+        #
+        # if self.iter[0] % 200 == 0 and self.conv1.in_channels == 64:
+        #     dic['cin'] = c_in
+        #     dic['alpha_C'+str(self.conv1.out_channels)] = alpha.detach().cpu().numpy()
+        #     dic['running_estimate_mean_C'+str(self.conv1.out_channels)] = \
+        #         self.estimate_mean.detach().cpu().numpy()
+        #     dic['running_estimate_var_C'+str(self.conv1.out_channels)] = \
+        #         self.estimate_var.detach().cpu().numpy()
+        #     dic['temp_estimate_mean_C'+str(self.conv1.out_channels)] = \
+        #         estimate_mean.detach().cpu().numpy()
+        #     dic['temp_estimate_var_C'+str(self.conv1.out_channels)] = \
+        #         estimate_var.detach().cpu().numpy()
+        #     dic['input_C'+str(self.conv1.out_channels)] = x.detach().cpu().numpy()
+        #     dic['beforeBN_C'+str(self.conv1.out_channels)] = out1.detach().cpu().numpy()
+        #     dic['afterBN_C'+str(self.conv1.out_channels)] = out2.detach().cpu().numpy()
+        #     dic['weight_C'+str(self.conv1.out_channels)] = self.conv1.weight.detach().cpu().numpy()
+        #     dic['iter_C'+str(self.conv1.out_channels)] = self.iter.detach().cpu().numpy()
+        #     np.savez(str(time.time()) + '_C'+str(self.conv1.out_channels)+'.npz', **dic)
+        # if self.training:
+        #     self.iter = nn.Parameter(self.iter + 1, requires_grad= False)
 
         if self.downsample is not None:
             residual = self.downsample(x)
