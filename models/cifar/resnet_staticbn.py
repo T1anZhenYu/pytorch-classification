@@ -48,7 +48,8 @@ class BasicBlock(nn.Module):
         out1 = self.relu(out0)
         out2 = self.conv2(out1)
         out3 = self.bn2(out2,self.conv2.weight,out1)
-        if self.training and self.iter % 200 == 0:
+        if self.iter %200 == 1 and self.training and self.conv1.in_channels == 32 and \
+                self.conv1.out_channels == 64:
             writer.add_histogram(tag='input',values=out1,global_step=self.iter)
             writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
                                  global_step=self.iter)
