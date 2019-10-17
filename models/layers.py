@@ -80,7 +80,7 @@ class MyStaticBatchNorm(nn.Module):
                                              (1-self.momente)*estimate_mean)
             self.running_var = nn.Parameter(self.running_var*self.momente + \
                                             (1-self.momente)* estimate_var)
-            return (x - self.running_mean)/torch.sqrt(self.running_var+self.eps)
+            return (x - estimate_mean)/torch.sqrt(estimate_var+self.eps)
         else :
             temp_estimate_mean = self.running_mean*self.momente + \
                                  (1-self.momente)*estimate_mean
