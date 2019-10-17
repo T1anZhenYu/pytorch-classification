@@ -68,6 +68,7 @@ class MyStaticBatchNorm(nn.Module):
         if self.residual:
             estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean*2)\
                 .view([1,self.num_features,1,1])
+            print((estimate_mean**2).shape())
             estimate_var = (alpha ** 2 * (c_in ** 2 * math.pow(math.pi,3/2) / 2 * \
             (weight_var + estimate_mean **2) - c_in ** 2 * math.pi/2 * estimate_mean **2)*4) \
                 .view([1,self.num_features,1,1])
