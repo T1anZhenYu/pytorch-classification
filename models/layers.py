@@ -68,15 +68,13 @@ class MyStaticBatchNorm(nn.Module):
         if self.residual:
             estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean*2)\
                 .view([1,self.num_features,1,1])
-
-            estimate_var = (alpha ** 2 * (c_in ** 2 * math.pow(math.pi,3/2) / 2 * \
-            (weight_var ))*4) \
+            estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var*4)\
                 .view([1,self.num_features,1,1])
         else:
             estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean)\
                 .view([1,self.num_features,1,1])
-            estimate_var = (alpha ** 2 * (c_in ** 2 * math.pow(math.pi,3/2) / 2 * \
-            (weight_var))).view([1,self.num_features,1,1])
+            estimate_var = (alpha ** 2 * c_in ** 2 * math.pi / 2 * weight_var)\
+                .view([1,self.num_features,1,1])
         if self.training:
             self.running_mean = nn.Parameter(self.momente*self.running_mean +\
                                              (1-self.momente)*estimate_mean)
