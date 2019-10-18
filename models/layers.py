@@ -82,11 +82,11 @@ class MyStaticBatchNorm(nn.Module):
                                             (1-self.momente)* estimate_var)
             return (x - estimate_mean)/torch.sqrt(estimate_var+self.eps)
         else :
-            temp_estimate_mean = self.running_mean*self.momente + \
-                                 (1-self.momente)*estimate_mean
-            temp_estimate_var = self.running_var * self.momente + \
-                                (1-self.momente) * estimate_var
-            return (x - temp_estimate_mean)/torch.sqrt(temp_estimate_var + self.eps)
+            # temp_estimate_mean = self.running_mean*self.momente + \
+            #                      (1-self.momente)*estimate_mean
+            # temp_estimate_var = self.running_var * self.momente + \
+            #                     (1-self.momente) * estimate_var
+            return (x - self.running_mean)/torch.sqrt(self.running_var + self.eps)
 
 class MYBatchNorm(nn.Module):
     '''custom implement batch normalization with autograd by Antinomy
