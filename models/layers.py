@@ -51,7 +51,7 @@ class MyStaticBatchNorm(nn.Module):
         self.running_mean = nn.Parameter(torch.zeros([1,self.num_features,1,1]))
 
         self.running_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
-        self.running_alpha = 1
+        self.running_alpha = nn.Parameter(torch.ones([1]),requires_grad=False)
     def forward(self, x,last_layer_weight,last_layer_input):
         c_in = last_layer_input.shape[1]
         weight_mean = torch.mean(last_layer_weight,(1,2,3))
@@ -65,8 +65,8 @@ class MyStaticBatchNorm(nn.Module):
         # alpha = self.alpha * self.momente + (1-self.momente) * real_max / estimate_max
         alpha = real_max / estimate_max
         if self.training:
-            self.running_alpha = self.momente * self.running_alpha + \
-                                 (1 - self.momente) * alpha
+            self.running_alpha = nn.Parameter(self.momente * self.running_alpha + \
+                                 (1 - self.momente) * alpha, requires_grad=False)
         if self.residual:
             estimate_mean = (c_in * math.sqrt(math.pi / 2) * weight_mean*2)\
                 .view([1,self.num_features,1,1])
