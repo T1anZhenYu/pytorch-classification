@@ -66,8 +66,8 @@ class MyStaticBatchNorm(nn.Module):
             self.running_weight_mean = nn.Parameter(weight_mean,requires_grad=False)
             self.running_weight_var = nn.Parameter(weight_var,requires_grad=False)
         else:
-            weight_mean = temp_weight_mean
-            weight_var = temp_weight_var
+            weight_mean = self.running_weight_mean
+            weight_var = self.running_weight_var
         real_max = torch.mean(torch.max(torch.max(torch.max(last_layer_input,dim=0)[0]\
                                        ,dim=-1)[0],dim=-1)[0])
         estimate_max = 0.83 * math.log(last_layer_input.shape[0] * \
