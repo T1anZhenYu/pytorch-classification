@@ -46,13 +46,44 @@ class BasicBlock(nn.Module):
         out3 = self.relu(out2)
         out4 = self.conv2(out3)
         out5 = self.bn2(out4)
+        if self.iter %200 == 1 and self.training and self.conv1.in_channels == 16 and \
+                self.conv1.out_channels == 32:
+            dic = {}
+            dic['first_input_C' + str(self.conv1.in_channels)] = x.detach().cpu().numpy()
+            dic['conv1_weight_C' + str(self.conv1.in_channels)] = \
+                self.conv1.weight.detach().cpu().numpy()
+            dic['first_output_C' + str(self.conv1.in_channels)] = \
+                out1.detach().cpu().numpy()
+            dic['second_input_C' + str(self.conv1.in_channels)] = out3.detach().cpu().numpy()
+            dic['conv2_weight_C' + str(self.conv1.in_channels)] = \
+                self.conv2.weight.detach().cpu().numpy()
+            dic['second_output_C' + str(self.conv1.in_channels)] = \
+                out4.detach().cpu().numpy()
+            np.savez(str(time.time()) + '_C' + str(self.conv1.in_channels) + '.npz', **dic)
+            writer.add_histogram(tag='input_inc_16',values=out3,global_step=self.iter)
+            writer.add_histogram(tag='conv2_weight_inc_16', values=self.conv2.weight,\
+                                 global_step=self.iter)
+            writer.add_histogram(tag='output_inc_16',values=out4,global_step=self.iter)
+            writer.add_histogram(tag='afterBN_inc_16',values=out5,global_step=self.iter)
         if self.iter %200 == 1 and self.training and self.conv1.in_channels == 32 and \
                 self.conv1.out_channels == 64:
-            writer.add_histogram(tag='input',values=out3,global_step=self.iter)
-            writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
+            dic = {}
+            dic['first_input_C' + str(self.conv1.in_channels)] = x.detach().cpu().numpy()
+            dic['conv1_weight_C' + str(self.conv1.in_channels)] = \
+                self.conv1.weight.detach().cpu().numpy()
+            dic['first_output_C' + str(self.conv1.in_channels)] = \
+                out1.detach().cpu().numpy()
+            dic['second_input_C' + str(self.conv1.in_channels)] = out3.detach().cpu().numpy()
+            dic['conv2_weight_C' + str(self.conv1.in_channels)] = \
+                self.conv2.weight.detach().cpu().numpy()
+            dic['second_output_C' + str(self.conv1.in_channels)] = \
+                out4.detach().cpu().numpy()
+            np.savez(str(time.time()) + '_C' + str(self.conv1.in_channels) + '.npz', **dic)
+            writer.add_histogram(tag='input_inc_32',values=out3,global_step=self.iter)
+            writer.add_histogram(tag='conv2_weight_inc_32', values=self.conv2.weight,\
                                  global_step=self.iter)
-            writer.add_histogram(tag='output',values=out4,global_step=self.iter)
-            writer.add_histogram(tag='afterBN',values=out5,global_step=self.iter)
+            writer.add_histogram(tag='output_inc_32',values=out4,global_step=self.iter)
+            writer.add_histogram(tag='afterBN_inc_32',values=out5,global_step=self.iter)
         self.iter += 1
         # dic = {}
         # c_in = self.conv1.in_channels
