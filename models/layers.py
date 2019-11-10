@@ -47,10 +47,26 @@ class Detach_max(nn.Module):
         super(Detach_max,self).__init__()
 
     def forward(self, input):
-        max_value = torch.max(torch.abs(input))
+
+        max_value = torch.max(torch.max(torch.max(torch.abs(input),\
+                            -1,True)[0], -1, True)[0], -1, True)[0]
         out = input / max_value * torch.detach(max_value)
 
         return out
+# class MyBatchNorm(nn.Module):
+#     def __init__(self, num_features):
+#         super(MyBatchNorm, self).__init__()
+#         self.num_features = num_features
+#         self.eps = 1e-5
+#         self.momente = 0.9
+#         self.running_mean = nn.Parameter(torch.zeros([1, self.num_features, 1, 1]))
+#         self.running_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
+#
+#
+#     def forward(self, x):
+#         input_shape = x.shape
+#         if len(input_shape) == 4:
+#             mean = torch.mean(x, dim=-1, )
 
 class MyStaticBatchNorm(nn.Module):
     def __init__(self, num_features, residual=True):
