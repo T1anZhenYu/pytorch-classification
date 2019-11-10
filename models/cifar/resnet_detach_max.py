@@ -35,7 +35,7 @@ class BasicBlock(nn.Module):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.detach_max = L.Detach_max()
+        # self.detach_max = L.Detach_max()
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = nn.BatchNorm2d(planes)
@@ -47,12 +47,12 @@ class BasicBlock(nn.Module):
         residual = x
 
         out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.detach_max(out)
+        # out = self.bn1(out)
+        # out = self.detach_max(out)
         out = self.relu(out)
         out = self.conv2(out)
-        out = self.bn2(out)
-        out = self.detach_max(out)
+        # out = self.bn2(out)
+        # out = self.detach_max(out)
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -117,7 +117,7 @@ class ResNet_Detach_max(nn.Module):
         self.conv1 = L.Conv2d(3, 16, kernel_size=3, padding=1,
                               bias=False)
         self.bn1 = nn.BatchNorm2d(16)
-        self.detach_max = L.Detach_max()
+        # self.detach_max = L.Detach_max()
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
         self.layer2 = self._make_layer(block, 32, n, stride=2)
@@ -152,8 +152,8 @@ class ResNet_Detach_max(nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.detach_max(x)
+        # x = self.bn1(x)
+        # x = self.detach_max(x)
         x = self.relu(x)  # 32x32
         x = self.layer1(x)  # 32x32
         x = self.layer2(x)  # 16x16
