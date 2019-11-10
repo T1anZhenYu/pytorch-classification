@@ -132,7 +132,7 @@ class ResNet_Detach_max(nn.Module):
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
                           kernel_size=1, stride=stride, bias=False),
-                
+
             )
 
         layers = []
