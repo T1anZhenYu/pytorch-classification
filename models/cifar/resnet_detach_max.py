@@ -183,7 +183,7 @@ class ResNet_Detach_Max(nn.Module):
         return x
 
 
-def resnet_ws(**kwargs):
+def resnet_detach_max(**kwargs):
     """
     Constructs a ResNet_WS model.
     """
