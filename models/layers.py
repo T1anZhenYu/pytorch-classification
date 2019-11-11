@@ -50,7 +50,9 @@ class Detach_max(nn.Module):
         print('input shape:')
         print(input.shape)
         max_value = torch.max(torch.max(torch.max(torch.abs(input),\
-                            -1,True)[0], -1, True)[0], -1, True)[0]
+                            0,True)[0], -1, True)[0], -1, True)[0]
+        print('max value:')
+        print(max_value.shape)
         out = input / max_value * torch.detach(max_value)
 
         return out
