@@ -47,7 +47,8 @@ class Detach_max(nn.Module):
         super(Detach_max,self).__init__()
 
     def forward(self, input):
-
+        print('input shape:')
+        print(input.shape)
         max_value = torch.max(torch.max(torch.max(torch.abs(input),\
                             -1,True)[0], -1, True)[0], -1, True)[0]
         out = input / max_value * torch.detach(max_value)
