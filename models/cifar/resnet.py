@@ -9,7 +9,7 @@ https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 '''
 import torch.nn as nn
 import math
-
+import torch
 
 __all__ = ['resnet']
 
@@ -153,6 +153,9 @@ class ResNet(nn.Module):
         x = self.layer3(x)  # 8x8
 
         x = self.avgpool(x)
+        nan_num = torch.sum(torch.isnan(x))[0]
+        print("nan_num is ",nan_num)
+
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
