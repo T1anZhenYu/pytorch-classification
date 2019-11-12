@@ -22,10 +22,12 @@ class Myfunc(autograd.Function):
         return inp.clone()
     @staticmethod
     def backward(ctx, g0):
-        print(g0)
+
         nan_num = torch.sum(torch.isnan(g0)).item()
-        print("nan value is :",nan_num)
-        raise RuntimeError("some error in backward")
+
+        if(nan_num > 0):
+            print("nan value is :", nan_num)
+            raise RuntimeError("some error in backward")
         return g0.clone()
 
 __all__ = ['resnet_detach_max']
@@ -175,7 +177,8 @@ class ResNet_Detach_max(nn.Module):
         x = self.layer2(x)  # 16x16
         x = self.layer3(x)  # 8x8
         nan_num = torch.sum(torch.isnan(x)).item()
-        print("nan_num is ",nan_num)
+        if nan_num > 0:
+            print("nan_num is ",nan_num)
         x = Myfunc.apply(x) #detec nan
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
