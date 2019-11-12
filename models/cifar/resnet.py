@@ -11,8 +11,9 @@ import torch.nn as nn
 import math
 import torch
 from .. import layers as L
+from torch.utils.tensorboard import SummaryWriter
 __all__ = ['resnet']
-
+writer = SummaryWriter('tensorboard_data')
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -33,6 +34,7 @@ class BasicBlock(nn.Module):
         self.downsample = downsample
         self.stride = stride
         self.bn1 = nn.BatchNorm2d(planes)
+        self.iter = 1
     def forward(self, x):
         residual = x
 
@@ -40,7 +42,6 @@ class BasicBlock(nn.Module):
         # out = self.bn1(out)
         # out = self.detach_max(out)
         out = self.relu(out)
-
         out = self.conv2(out)
         # out = self.bn2(out)
         # out = self.detach_max(out)
@@ -50,6 +51,14 @@ class BasicBlock(nn.Module):
         out += residual
         out = self.relu(out)
 
+        if self.iter %20 == 1 and self.training and self.conv1.in_channels == 32 and \
+                self.conv1.out_channels == 64:
+            writer.add_histogram(tag='output',values=out,global_step=self.iter)
+            writer.add_histogram(tag='conv2_weight', values=self.conv2.weight,\
+                                 global_step=self.iter)
+            writer.add_histogram(tag='conv1_weight', values=self.conv1.weight,\
+                                 global_step=self.iter)
+        self.iter += 1
         return out
 
 
