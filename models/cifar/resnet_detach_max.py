@@ -23,6 +23,9 @@ class Myfunc(autograd.Function):
     @staticmethod
     def backward(ctx, g0):
         print(g0)
+        nan_num = torch.sum(torch.isnan(g0))
+        if nan_num > 0:
+            print("nan value is :",nan_num)
         raise RuntimeError("some error in backward")
         return g0.clone()
 
