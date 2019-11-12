@@ -28,6 +28,7 @@ class Myfunc(autograd.Function):
         if(nan_num > 0):
             print()
             print("nan value is :", nan_num)
+            print(g0)
             raise RuntimeError("some error in backward")
         return g0.clone()
 
