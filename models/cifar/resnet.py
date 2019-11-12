@@ -153,7 +153,7 @@ class ResNet(nn.Module):
         x = self.layer3(x)  # 8x8
 
         x = self.avgpool(x)
-        nan_num = torch.sum(torch.isnan(x))[0]
+        nan_num = torch.sum(torch.isnan(x)).item()
         print("nan_num is ",nan_num)
 
         x = x.view(x.size(0), -1)
