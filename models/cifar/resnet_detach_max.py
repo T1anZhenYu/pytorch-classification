@@ -22,6 +22,7 @@ class Myfunc(autograd.Function):
         return inp.clone()
     @staticmethod
     def backward(ctx, g0):
+        print(g0)
         raise RuntimeError("some error in backward")
         return g0.clone()
 
