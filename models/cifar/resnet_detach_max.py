@@ -26,6 +26,7 @@ class Myfunc(autograd.Function):
         nan_num = torch.sum(torch.isnan(g0)).item()
 
         if(nan_num > 0):
+            print()
             print("nan value is :", nan_num)
             raise RuntimeError("some error in backward")
         return g0.clone()
@@ -177,6 +178,7 @@ class ResNet_Detach_max(nn.Module):
         x = self.layer2(x)  # 16x16
         x = self.layer3(x)  # 8x8
         nan_num = torch.sum(torch.isnan(x)).item()
+        print()
         if nan_num > 0:
             print("layer3 output:nan_num is ",nan_num)
         x = Myfunc.apply(x) #detec nan
