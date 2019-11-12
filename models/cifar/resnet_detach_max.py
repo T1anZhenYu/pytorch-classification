@@ -178,7 +178,7 @@ class ResNet_Detach_max(nn.Module):
         x = self.layer3(x)  # 8x8
         nan_num = torch.sum(torch.isnan(x)).item()
         if nan_num > 0:
-            print("nan_num is ",nan_num)
+            print("layer3 output:nan_num is ",nan_num)
         x = Myfunc.apply(x) #detec nan
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
