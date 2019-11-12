@@ -64,12 +64,12 @@ class BasicBlock(nn.Module):
         residual = x
 
         out = self.conv1(x)
-        out = self.detach_max(out)
+        # out = self.detach_max(out)
         # out = self.bn1(out)
 
         out = self.relu(out)
         out = self.conv2(out)
-        out = self.detach_max(out)
+        # out = self.detach_max(out)
         # out = self.bn2(out)
 
         if self.downsample is not None:
@@ -172,7 +172,7 @@ class ResNet_Detach_max(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         # x = self.bn1(x)
-        x = self.detach_max(x)
+        # x = self.detach_max(x)
         x = self.relu(x)  # 32x32
         x = self.layer1(x)  # 32x32
         x = self.layer2(x)  # 16x16
