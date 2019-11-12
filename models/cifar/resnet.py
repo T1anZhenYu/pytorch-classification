@@ -10,7 +10,7 @@ https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 import torch.nn as nn
 import math
 import torch
-
+from .. import layers as L
 __all__ = ['resnet']
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -27,6 +27,7 @@ class BasicBlock(nn.Module):
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm2d(planes)
         self.relu = nn.ReLU(inplace=True)
+        self.detach_max = L.Detach_max()
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
@@ -37,11 +38,12 @@ class BasicBlock(nn.Module):
 
         out = self.conv1(x)
         # out = self.bn1(out)
+        out = self.detach_max(out)
         out = self.relu(out)
 
         out = self.conv2(out)
         # out = self.bn2(out)
-
+        out = self.detach_max(out)
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -111,6 +113,7 @@ class ResNet(nn.Module):
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(16)
+        self.detach_max = L.Detach_max()
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
         self.layer2 = self._make_layer(block, 32, n, stride=2)
@@ -146,6 +149,7 @@ class ResNet(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         # x = self.bn1(x)
+        x = self.detach_max(x)
         x = self.relu(x)    # 32x32
 
         x = self.layer1(x)  # 32x32
