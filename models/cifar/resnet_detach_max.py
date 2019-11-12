@@ -19,7 +19,7 @@ from torch import autograd
 class Myfunc(autograd.Function):
     @staticmethod
     def forward(ctx, inp):
-        return inp.clone()
+        return inp
     @staticmethod
     def backward(ctx, g0):
 
@@ -30,7 +30,7 @@ class Myfunc(autograd.Function):
             print("nan value is :", nan_num)
             print(g0)
             raise RuntimeError("some error in backward")
-        return g0.clone()
+        return g0
 
 __all__ = ['resnet_detach_max']
 
