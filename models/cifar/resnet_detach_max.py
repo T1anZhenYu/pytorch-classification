@@ -14,6 +14,17 @@ from .. import layers as L
 import numpy as np
 import time
 
+from torch import autograd
+
+class Myfunc(autograd.Function):
+    @staticmethod
+    def forward(ctx, inp):
+        return inp.clone()
+    @staticmethod
+    def backward(ctx, g0):
+        raise RuntimeError("some error in backward")
+        return g0.clone()
+
 __all__ = ['resnet_detach_max']
 
 
@@ -160,6 +171,7 @@ class ResNet_Detach_max(nn.Module):
         x = self.layer1(x)  # 32x32
         x = self.layer2(x)  # 16x16
         x = self.layer3(x)  # 8x8
+        x = Myfunc.apply(x) #detec nan
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.fc(x)
