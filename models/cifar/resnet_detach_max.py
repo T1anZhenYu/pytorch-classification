@@ -181,6 +181,7 @@ class ResNet_Detach_max(nn.Module):
         print()
         if nan_num > 0:
             print("layer3 output:nan_num is ",nan_num)
+            raise RuntimeError("some error in forward")
         x = Myfunc.apply(x) #detec nan
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
