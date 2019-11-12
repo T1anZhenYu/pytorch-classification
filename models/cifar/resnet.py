@@ -38,12 +38,12 @@ class BasicBlock(nn.Module):
 
         out = self.conv1(x)
         # out = self.bn1(out)
-        out = self.detach_max(out)
+        # out = self.detach_max(out)
         out = self.relu(out)
 
         out = self.conv2(out)
         # out = self.bn2(out)
-        out = self.detach_max(out)
+        # out = self.detach_max(out)
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -94,7 +94,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, depth, num_classes=1000, block_name='BasicBlock'):
+    def __init__(self, depth, num_classes=10, block_name='BasicBlock'):
         super(ResNet, self).__init__()
         # Model type specifies number of layers for CIFAR-10 model
         if block_name.lower() == 'basicblock':
@@ -135,7 +135,7 @@ class ResNet(nn.Module):
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
                           kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(planes * block.expansion),
+                # nn.BatchNorm2d(planes * block.expansion),
             )
 
         layers = []
@@ -149,7 +149,7 @@ class ResNet(nn.Module):
     def forward(self, x):
         x = self.conv1(x)
         # x = self.bn1(x)
-        x = self.detach_max(x)
+        # x = self.detach_max(x)
         x = self.relu(x)    # 32x32
 
         x = self.layer1(x)  # 32x32
