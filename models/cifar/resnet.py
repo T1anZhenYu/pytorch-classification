@@ -30,10 +30,10 @@ class BasicBlock(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.detach_max = L.Detach_max()
         self.conv2 = conv3x3(planes, planes)
-        self.bn2 = nn.BatchNorm2d(planes)
+        self.bn2 = L.MyBatchNorm(planes)
         self.downsample = downsample
         self.stride = stride
-        self.bn1 = nn.BatchNorm2d(planes)
+        self.bn1 = L.MyBatchNorm(planes)
         self.iter = 1
     def forward(self, x):
         residual = x
@@ -121,7 +121,7 @@ class ResNet(nn.Module):
         self.inplanes = 16
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
                                bias=False)
-        self.bn1 = nn.BatchNorm2d(16)
+        self.bn1 = L.MyBatchNorm(16)
         self.detach_max = L.Detach_max()
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
@@ -144,7 +144,7 @@ class ResNet(nn.Module):
             downsample = nn.Sequential(
                 nn.Conv2d(self.inplanes, planes * block.expansion,
                           kernel_size=1, stride=stride, bias=False),
-                # nn.BatchNorm2d(planes * block.expansion),
+                L.MyBatchNorm(planes * block.expansion),
             )
 
         layers = []
@@ -157,7 +157,7 @@ class ResNet(nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
-        # x = self.bn1(x)
+        x = self.bn1(x)
         # x = self.detach_max(x)
         x = self.relu(x)    # 32x32
 
@@ -166,8 +166,8 @@ class ResNet(nn.Module):
         x = self.layer3(x)  # 8x8
 
         x = self.avgpool(x)
-        nan_num = torch.sum(torch.isnan(x)).item()
-        print("nan_num is ",nan_num)
+        # nan_num = torch.sum(torch.isnan(x)).item()
+        # print("nan_num is ",nan_num)
 
         x = x.view(x.size(0), -1)
         x = self.fc(x)
