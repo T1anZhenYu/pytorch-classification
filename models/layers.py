@@ -52,20 +52,37 @@ class Detach_max(nn.Module):
         out = input / max_value * torch.detach(max_value)
 
         return out
-# class MyBatchNorm(nn.Module):
-#     def __init__(self, num_features):
-#         super(MyBatchNorm, self).__init__()
-#         self.num_features = num_features
-#         self.eps = 1e-5
-#         self.momente = 0.9
-#         self.running_mean = nn.Parameter(torch.zeros([1, self.num_features, 1, 1]))
-#         self.running_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
-#
-#
-#     def forward(self, x):
-#         input_shape = x.shape
-#         if len(input_shape) == 4:
-#             mean = torch.mean(x, dim=-1, )
+class MyBatchNorm(nn.Module):
+    def __init__(self, num_features, affine = False):
+        super(MyBatchNorm, self).__init__()
+        self.num_features = num_features
+        self.eps = 1e-5
+        self.momente = 0.9
+        self.running_mean = nn.Parameter(torch.zeros([1, self.num_features, 1, 1]))
+        self.running_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
+        self.affine = affine
+        self.alpha = nn.Parameter(torch.ones([1,self.num_features,1,1]))
+        self.beta = nn.Parameter(torch.zeros([1,self.num_features,1,1]))
+    def forward(self, x):
+        input_shape = x.shape
+        if len(input_shape) == 4:
+            mean = torch.mean(torch.mean(torch.mean(x,0,True)[0],2,True)[0],-1,True)[0]
+            var = torch.var(torch.var(torch.var(x,0,True)[0],2,True)[0],-1,True)[0]
+
+            if self.training:
+                x = (x - mean)/torch.sqrt(var + self.eps)
+                self.running_mean = self.running_mean * self.momente + mean * \
+                                    (1 - self.momente)
+                self.running_var = self.running_var * self.momente + var * \
+                                   (1 - self.momente)
+                if self.affine:
+                    x = self.alpha * x + self.beta
+            else:
+                x = (x - self.running_mean) / torch.sqrt(self.running_var + self.eps)
+
+                if self.affine:
+                    x = self.alpha * x + self.beta
+        return x
 
 class MyStaticBatchNorm(nn.Module):
     def __init__(self, num_features, residual=True):
