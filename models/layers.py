@@ -72,9 +72,9 @@ class MyBatchNorm(nn.Module):
 
             if self.training:
                 x = (x - mean)/torch.sqrt(var + self.eps)
-                self.running_mean = torch.Parameter(self.running_mean * self.momente + mean * \
+                self.running_mean = nn.Parameter(self.running_mean * self.momente + mean * \
                                     (1 - self.momente))
-                self.running_var = torch.Parameter(self.running_var * self.momente + var * \
+                self.running_var = nn.Parameter(self.running_var * self.momente + var * \
                                    (1 - self.momente))
                 if self.affine:
                     x = self.alpha * x + self.beta
