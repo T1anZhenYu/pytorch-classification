@@ -67,7 +67,8 @@ class MyBatchNorm(nn.Module):
         input_shape = x.shape
         if len(input_shape) == 4:
             mean = torch.mean(torch.mean(torch.mean(x,0,True)[0],2,True)[0],-1,True)[0]
-            var = torch.var(torch.var(torch.var(x,0,True)[0],2,True)[0],-1,True)[0]
+            var = torch.var(torch.var(torch.var(x,dim = 0,keepdim = True)[0],dim = 2,\
+                                      keepdim = True)[0],dim = -1,keepdim = True)[0]
 
             if self.training:
                 x = (x - mean)/torch.sqrt(var + self.eps)
