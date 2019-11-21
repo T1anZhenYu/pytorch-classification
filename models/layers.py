@@ -4,44 +4,6 @@ from torch.nn.parameter import Parameter
 from torch.nn import functional as F
 import math
 
-
-class GroupNorm(nn.Module):
-    def __init__(self, num_features, num_groups=32, eps=1e-5):
-        super(GroupNorm, self).__init__()
-        self.weight = nn.Parameter(torch.ones(1, num_features, 1, 1))
-        self.bias = nn.Parameter(torch.zeros(1, num_features, 1, 1))
-        self.num_groups = num_groups
-        self.eps = eps
-        if num_groups > num_features:
-            self.moving_mean = torch.zeros([1, num_features, 1]).cuda().detach()
-            self.moving_var = torch.ones([1, num_features, 1]).cuda().detach()
-        else:
-            self.moving_mean = torch.zeros([1, num_groups, 1]).cuda().detach()
-            self.moving_var = torch.ones([1, num_groups, 1]).cuda().detach()
-        self.momente = 0.9
-
-    def forward(self, x):
-        N, C, H, W = x.size()
-        G = self.num_groups
-        if C < G:
-            G = C
-
-        assert C % G == 0
-
-        x = x.view(N, G, -1)
-        temp_mean = x.mean(-1, keepdim=True)
-        temp_var = x.var(-1, keepdim=True)
-        mean = temp_mean * (self.momente) + (1 - self.momente) * self.moving_mean
-
-        var = temp_var * (self.momente) + self.moving_var * (1 - self.momente)
-        if self.training:
-            self.moving_mean = (temp_mean * (1 - self.momente) +
-                                self.momente * self.moving_mean).detach()
-            self.moving_var = (temp_var * (1 - self.momente) +
-                               self.moving_var * self.momente).detach()
-        x = (x - mean) / (var + self.eps).sqrt()
-        x = x.view(N, C, H, W)
-        return x * self.weight + self.bias
 class Detach_max(nn.Module):
     def __init__(self):
         super(Detach_max,self).__init__()
@@ -52,36 +14,73 @@ class Detach_max(nn.Module):
         out = input / max_value * torch.detach(max_value)
 
         return out
+class MyBatchNormFunction(torch.autograd.Function):
+
+    # 必须是staticmethod
+    @staticmethod
+    # 第一个是ctx，第二个是input，其他是可选参数。
+    # ctx在这里类似self，ctx的属性可以在backward中调用。
+    def forward(self,x,mean,var,eps,alpha,beta):
+        self.save_for_backward(x,mean,var,torch.tensor(eps),alpha,beta)
+        return (x - mean) / torch.sqrt(var + eps) * alpha + beta
+    @staticmethod
+    def backward(self, grad_output):
+
+        x, mean, var, eps, alpha, beta = self.saved_variables
+        batch_size = x.shape[0]
+        dL_dXhat = grad_output * alpha
+        dL_dSigama = torch.sum(dL_dXhat * (x - mean) * (-0.5) * \
+                               torch.pow(var + eps.item(),-1.5), dim=0,keepdim=True)
+
+        I = dL_dXhat / torch.sqrt(var + eps.item()) + dL_dSigama * 2 * (x - mean) / batch_size
+
+        dL_dmean = - torch.sum(I,dim=0,keepdim=True)
+
+        dL_dX = I + 1/batch_size*dL_dmean
+
+        x_hat = (x - mean)/torch.sqrt(var)
+        dL_dAlpha = torch.sum(x_hat * grad_output,dim=0,keepdim=True)
+        dL_dBeta = torch.sum(grad_output,dim=0,keepdim=True)
+        return dL_dX,None,None,None,dL_dAlpha,dL_dBeta
+
 class MyBatchNorm(nn.Module):
-    def __init__(self, num_features, affine = False):
+    def __init__(self,num_features,affine=False):
         super(MyBatchNorm, self).__init__()
         self.num_features = num_features
-        self.eps = 1e-5
+        self.eps = 1e-05
         self.momente = 0.9
         self.running_mean = nn.Parameter(torch.zeros([1, self.num_features, 1, 1]))
         self.running_var = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
         self.affine = affine
-        self.alpha = nn.Parameter(torch.ones([1,self.num_features,1,1]))
-        self.beta = nn.Parameter(torch.zeros([1,self.num_features,1,1]))
-    def forward(self, x):
-        input_shape = x.shape
-        if len(input_shape) == 4:
-            mean = torch.mean(torch.mean(torch.mean(x,0,True),2,True),-1,True)
-            var = torch.mean(torch.mean(torch.mean((x - mean) **2,0,True),2,True),-1,True)
-            if self.training:
-                x = (x - mean)/torch.sqrt(var + self.eps)
-                self.running_mean = nn.Parameter(self.running_mean * self.momente + mean * \
-                                    (1 - self.momente))
-                self.running_var = nn.Parameter(self.running_var * self.momente + var * \
-                                   (1 - self.momente))
-                if self.affine:
-                    x = self.alpha * x + self.beta
-            else:
-                x = (x - self.running_mean) / torch.sqrt(self.running_var + self.eps)
 
-                if self.affine:
-                    x = self.alpha * x + self.beta
-        return x
+        if self.affine:
+            self.alpha = nn.Parameter(torch.ones([1, self.num_features, 1, 1]))
+            self.beta = nn.Parameter(torch.zeros([1, self.num_features, 1, 1]))
+        else:
+            self.alpha = nn.Parameter(torch.ones([1, self.num_features, 1, 1]),\
+                                      requires_grad=False)
+            self.beta = nn.Parameter(torch.zeros([1, self.num_features, 1, 1]),\
+                                     requires_grad=False)
+        self.training = True
+    def forward(self, x):
+        if self.training:
+            mean = torch.mean(torch.mean(torch.mean(x, \
+                                                    0, True), 2, True), -1, True)
+            # print(mean[0,:,0,0])
+            var = torch.mean(torch.mean(torch.mean((x -\
+                mean) ** 2, 0, True), 2, True), -1, True) + self.eps
+            self.running_mean = nn.Parameter(self.running_mean * self.momente + mean * \
+                                             (1 - self.momente))
+            self.running_var = nn.Parameter(self.running_var * self.momente + var * \
+                                            (1 - self.momente))
+
+            output = MyBatchNormFunction(x,mean,var,self.eps,self.alpha,self.beta)
+            return output
+        else:
+            x_hat = (x - self.running_mean)/ torch.sqrt(self.running_var + self.eps)
+            return x_hat * self.alpha + self.beta
+
+
 
 class MyStaticBatchNorm(nn.Module):
     def __init__(self, num_features, residual=True):
