@@ -29,12 +29,12 @@ def BatchNorm2d(num_features):
 
 
 class TLU(nn.Module):
-    def __init__(self, num_features,inplace=True):
+    def __init__(self, num_features):
         """
         max(y, tau) = max(y - tau, 0) + tau = ReLU(y - tau) + tau
         """
         super(TLU, self).__init__()
-        self.inplace = inplace
+
         self.tau = nn.parameter.Parameter(torch.Tensor(1, num_features, 1, 1), \
                                           requires_grad=True)
 
@@ -42,7 +42,7 @@ class TLU(nn.Module):
         nn.init.zeros_(self.tau)
 
     def forward(self, x):
-        return F.relu(x - self.tau, inplace=self.inplace) + self.tau
+        return F.relu(x - self.tau) + self.tau
 
     def extra_repr(self):
         inplace_str = 'inplace=True' if self.inplace else ''
