@@ -131,7 +131,7 @@ class FilterResponseNormalization(nn.Module):
         assert (self.gamma.shape[1], self.beta.shape[1], self.tau.shape[1]) == (c, c, c)
 
         # Compute the mean norm of activations per channel
-        nu2 = torch.mean(torch.mean(x.pow(2), dim=2, keepdims=True),dim=3,keepdims=True)
+        nu2 = torch.mean(torch.mean(x.pow(2), dim=-1),dim=-1).reshape(n,c,1,1)
         # Perform FRN
         x = x * torch.rsqrt(nu2 + torch.abs(self.eps))
         # Return after applying the Offset-ReLU non-linearity
