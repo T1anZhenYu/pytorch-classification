@@ -26,3 +26,74 @@ class Conv2d(nn.Conv2d):
 def BatchNorm2d(num_features):
     return nn.GroupNorm(num_channels=num_features, num_groups=32)
 
+
+
+class TLU(nn.Module):
+    def __init__(self, inplace=True):
+        """
+        max(y, tau) = max(y - tau, 0) + tau = ReLU(y - tau) + tau
+        """
+        super(TLU, self).__init__()
+        self.inplace = inplace
+        self.tau = nn.parameter.Parameter(torch.zeros(1), requires_grad=True)
+
+    def reset_parameters(self):
+        nn.init.zeros_(self.tau)
+
+    def forward(self, x):
+        return F.relu(x - self.tau, inplace=self.inplace) + self.tau
+
+    def extra_repr(self):
+        inplace_str = 'inplace=True' if self.inplace else ''
+        return inplace_str
+
+
+class FRN(nn.Module):
+    def __init__(self, num_features, init_eps=1e-6):
+        """
+        weight = gamma, bias = beta
+        beta, gamma:
+            Variables of shape [1, 1, 1, C]. if TensorFlow
+            Variables of shape [1, C, 1, 1]. if PyTorch
+        eps: A scalar constant or learnable variable.
+        """
+        super(FRN, self).__init__()
+
+        self.num_features = num_features
+        self.init_eps = init_eps
+
+        self.weight = nn.parameter.Parameter(
+            torch.Tensor(1, num_features, 1, 1), requires_grad=True)
+        self.bias = nn.parameter.Parameter(
+            torch.Tensor(1, num_features, 1, 1), requires_grad=True)
+        self.eps = nn.parameter.Parameter(
+            torch.Tensor(1), requires_grad=True)
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        nn.init.ones_(self.weight)
+        nn.init.zeros_(self.bias)
+        nn.init.zeros_(self.eps)
+
+    def extra_repr(self):
+        return 'num_features={num_features}, eps={init_eps}'.format(**self.__dict__)
+
+    def forward(self, x):
+        """
+        0, 1, 2, 3 -> (B, H, W, C) in TensorFlow
+        0, 1, 2, 3 -> (B, C, H, W) in PyTorch
+        TensorFlow code
+            nu2 = tf.reduce_mean(tf.square(x), axis=[1, 2], keepdims=True)
+            x = x * tf.rsqrt(nu2 + tf.abs(eps))
+            # This Code include TLU function max(y, tau)
+            return tf.maximum(gamma * x + beta, tau)
+        """
+        # Compute the mean norm of activations per channel.
+        nu2 = (x ** 2).mean(dim=[2, 3], keepdim=True)
+
+        # Perform FRN.
+        x = x * (nu2 + self.init_eps + self.eps.abs())**(-0.5)
+
+        # Scale and Bias
+        x = self.weight * x + self.bias
+        return x
