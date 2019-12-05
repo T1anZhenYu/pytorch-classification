@@ -19,8 +19,8 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import models.cifar as models
-
-from utils import Bar, Logger, AverageMeter, accuracy, mkdir_p, savefig
+from progress.bar import Bar
+from utils import  Logger, AverageMeter, accuracy, mkdir_p, savefig
 
 
 model_names = sorted(name for name in models.__dict__
