@@ -20,7 +20,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import models.cifar as models
 from progress.bar import Bar
-from utils import  Logger, AverageMeter, accuracy, mkdir_p, savefig
+from utils import Logger, AverageMeter, accuracy, mkdir_p, savefig
 
 
 model_names = sorted(name for name in models.__dict__
@@ -160,6 +160,12 @@ def main():
                     dropRate=args.drop,
                 )
     elif args.arch.endswith('resnet'):
+        model = models.__dict__[args.arch](
+                    num_classes=num_classes,
+                    depth=args.depth,
+                    block_name=args.block_name,
+                )
+    elif args.arch.endswith('resnet_frn'):
         model = models.__dict__[args.arch](
                     num_classes=num_classes,
                     depth=args.depth,
