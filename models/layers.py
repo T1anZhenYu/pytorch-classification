@@ -115,7 +115,7 @@ class FilterResponseNormalization(nn.Module):
             torch.Tensor(1, num_features, 1, 1), requires_grad=True)
         self.tau = nn.parameter.Parameter(
             torch.Tensor(1, num_features, 1, 1), requires_grad=True)
-        self.eps = torch.Tensor([eps])
+        self.eps = nn.parameter.Parameter(torch.Tensor([eps]),requires_grad=False)
     def reset_parameters(self):
         nn.init.ones_(self.gamma)
         nn.init.zeros_(self.beta)
@@ -132,8 +132,7 @@ class FilterResponseNormalization(nn.Module):
 
         # Compute the mean norm of activations per channel
         nu2 = torch.mean(torch.mean(x.pow(2), dim=-1),dim=-1).reshape(n,c,1,1)
-        print('nu2:',nu2.device)
-        print("eps:",self.eps.device)
+
         # Perform FRN
         x = x * torch.rsqrt(nu2 + torch.abs(self.eps))
         # Return after applying the Offset-ReLU non-linearity
