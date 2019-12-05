@@ -9,7 +9,7 @@ https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 '''
 import torch.nn as nn
 import math
-from ..layers import TLU,FRN
+from ..layers import FilterResponseNormalization
 
 __all__ = ['resnet_frn']
 
@@ -32,10 +32,10 @@ class BasicBlock(nn.Module):
         self.downsample = downsample
         self.stride = stride
 
-        self.frn1 = FRN(planes)
-        self.tlu1 = TLU()
-        self.frn2 = FRN(planes)
-        self.tlu2 = TLU()
+        self.frn1 = FilterResponseNormalization(planes)
+
+        self.frn2 = FilterResponseNormalization(planes)
+
 
     def forward(self, x):
         residual = x
@@ -44,12 +44,12 @@ class BasicBlock(nn.Module):
         # out = self.bn1(out)
         # out = self.relu(out)
         out = self.frn1(out)
-        out = self.tlu1(out)
+
 
         out = self.conv2(out)
         # out = self.bn2(out)
         out = self.frn2(out)
-        out = self.tlu2(out)
+
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -119,8 +119,8 @@ class ResNet_Frn(nn.Module):
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, padding=1,
                                bias=False)
         # self.bn1 = nn.BatchNorm2d(16)
-        self.frn1 = FRN(16)
-        self.tlu = TLU()
+        self.frn1 = FilterResponseNormalization(16)
+
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_layer(block, 16, n)
         self.layer2 = self._make_layer(block, 32, n, stride=2)
@@ -158,7 +158,7 @@ class ResNet_Frn(nn.Module):
         # x = self.bn1(x)
         # x = self.relu(x)    # 32x32
         x = self.frn1(x)
-        x = self.tlu(x)
+
 
         x = self.layer1(x)  # 32x32
         x = self.layer2(x)  # 16x16
