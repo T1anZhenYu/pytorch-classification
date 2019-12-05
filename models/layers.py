@@ -132,6 +132,8 @@ class FilterResponseNormalization(nn.Module):
 
         # Compute the mean norm of activations per channel
         nu2 = torch.mean(torch.mean(x.pow(2), dim=-1),dim=-1).reshape(n,c,1,1)
+        print('nu2:',type(nu2))
+        print("eps:",type(self.eps))
         # Perform FRN
         x = x * torch.rsqrt(nu2 + torch.abs(self.eps))
         # Return after applying the Offset-ReLU non-linearity
