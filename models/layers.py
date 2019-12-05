@@ -118,8 +118,8 @@ class FilterResponseNormalization(nn.Module):
         self.eps = nn.parameter.Parameter(torch.Tensor([eps]),requires_grad=False)
         self.reset_parameters()
     def reset_parameters(self):
-        nn.init.ones_(self.weight)
-        nn.init.zeros_(self.gamma)
+        nn.init.ones_(self.gamma)
+        nn.init.zeros_(self.beta)
         nn.init.zeros_(self.tau)
     def forward(self, x):
         """
