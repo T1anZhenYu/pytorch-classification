@@ -20,6 +20,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import models.cifar as models
 from progress.bar import Bar
+import math
 from utils import Logger, AverageMeter, accuracy, mkdir_p, savefig
 
 
@@ -348,12 +349,18 @@ def save_checkpoint(state, is_best, checkpoint='checkpoint', filename='checkpoin
     if is_best:
         shutil.copyfile(filepath, os.path.join(checkpoint, 'model_best.pth.tar'))
 
+# def adjust_learning_rate(optimizer, epoch):
+#     global state
+#     if epoch in args.schedule:
+#         state['lr'] *= args.gamma
+#         for param_group in optimizer.param_groups:
+#             param_group['lr'] = state['lr']
 def adjust_learning_rate(optimizer, epoch):
-    global state
-    if epoch in args.schedule:
-        state['lr'] *= args.gamma
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = state['lr']
 
+    lr_min = 0.001
+    lr_max = 0.1
+    lr = lr_min + 0.5*(lr_max - lr_min)*(epoch / args.epochs * 1.5 * math.pi)
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
 if __name__ == '__main__':
     main()
