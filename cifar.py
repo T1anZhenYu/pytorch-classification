@@ -326,12 +326,10 @@ def test(testloader, model, criterion, epoch, use_cuda):
         end = time.time()
 
         # plot progress
-        bar.suffix  = '({batch}/{size}) Data: {data:.3f}s | Batch: {bt:.3f}s | Total: {total:} | ETA: {eta:} | Loss: {loss:.4f} | top1: {top1: .4f} | top5: {top5: .4f}'.format(
-                    batch=batch_idx + 1,
+        bar.suffix  = '(| Total: {total:} | ETA: {eta:} \
+                        | Loss: {loss:.4f} | top1: {top1: .4f} | \
+                        top5: {top5: .4f}'.format(
                     size=len(testloader),
-                    data=data_time.avg,
-                    bt=batch_time.avg,
-                    total=bar.elapsed_td,
                     eta=bar.eta_td,
                     loss=losses.avg,
                     top1=top1.avg,
